@@ -1,0 +1,31 @@
+{
+  "collectionName": "components_blocks_booking_ctas",
+  "info": {
+    "displayName": "Booking CTA",
+    "description": "Call-to-action for Book Your Stay",
+    "icon": "calendar"
+  },
+  "options": {},
+  "attributes": {
+    "headline": {
+      "type": "string",
+      "required": true
+    },
+    "body": {
+      "type": "text"
+    },
+    "bookingUrl": {
+      "type": "string",
+      "required": true
+    },
+    "buttonLabel": {
+      "type": "string",
+      "default": "Book Your Stay"
+    },
+    "backgroundImage": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

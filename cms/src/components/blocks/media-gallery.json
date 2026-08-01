@@ -1,0 +1,17 @@
+{
+  "collectionName": "components_blocks_media_galleries",
+  "info": {
+    "displayName": "Media Gallery",
+    "description": "Standalone slideshow block for dynamic zones",
+    "icon": "landscape"
+  },
+  "options": {},
+  "attributes": {
+    "slideshow": {
+      "type": "component",
+      "repeatable": false,
+      "component": "media.slideshow",
+      "required": true
+    }
+  }
+}
