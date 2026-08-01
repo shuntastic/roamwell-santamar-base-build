@@ -1,6 +1,9 @@
+'use client';
+
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 import type { BlocksHero } from '@/types/cms';
 import { getStrapiMediaUrl } from '@/lib/strapi';
 import { HeroMotion } from '@/components/blocks/HeroMotion';
@@ -12,6 +15,7 @@ type Props = {
 };
 
 export function HeroBlock({ block, locale }: Props) {
+  const theme = useTheme();
   const mediaUrl = getStrapiMediaUrl(block.backgroundMedia?.url);
   const isVideo = block.backgroundMedia?.mime?.startsWith('video/');
   const href = block.cta?.url
@@ -20,12 +24,14 @@ export function HeroBlock({ block, locale }: Props) {
       : `/${locale}${block.cta.url === '/' ? '' : block.cta.url}`
     : null;
 
+  const fallbackGradient = `linear-gradient(135deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.main} 45%, ${theme.palette.primary.light} 75%, ${theme.palette.secondary.main} 140%)`;
+
   return (
     <Box
       component="section"
       sx={{
         position: 'relative',
-        minHeight: { xs: '88vh', md: '92vh' },
+        minHeight: theme.layout.heroMinHeight,
         display: 'flex',
         alignItems: 'flex-end',
         color: 'primary.contrastText',
@@ -53,26 +59,21 @@ export function HeroBlock({ block, locale }: Props) {
             />
           )
         ) : (
-          <Box
-            sx={{
-              width: '100%',
-              height: '100%',
-              background:
-                'linear-gradient(135deg, #073A50 0%, #0B4F6C 45%, #1B6B8A 75%, #C45C26 140%)',
-            }}
-          />
+          <Box sx={{ width: '100%', height: '100%', background: fallbackGradient }} />
         )}
         <Box
           sx={{
             position: 'absolute',
             inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(7,58,80,0.25) 0%, rgba(7,58,80,0.72) 70%, rgba(7,58,80,0.88) 100%)',
+            background: `linear-gradient(180deg, ${theme.palette.primary.dark}40 0%, ${theme.palette.primary.dark}b8 70%, ${theme.palette.primary.dark}e0 100%)`,
           }}
         />
       </Box>
 
-      <Container maxWidth="lg" sx={{ position: 'relative', pb: { xs: 8, md: 12 }, pt: 16 }}>
+      <Container
+        maxWidth={theme.layout.contentMaxWidth}
+        sx={{ position: 'relative', pb: { xs: 8, md: 12 }, pt: 16 }}
+      >
         <HeroMotion>
           {block.eyebrow ? (
             <Typography variant="overline" sx={{ letterSpacing: '0.18em', opacity: 0.9 }}>

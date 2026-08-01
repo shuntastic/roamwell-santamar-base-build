@@ -94,7 +94,7 @@ export function Slideshow({ slideshow }: Props) {
             bottom: { xs: 24, md: 36 },
             zIndex: 2,
             maxWidth: 640,
-            fontFamily: 'var(--font-display), Georgia, serif',
+            fontFamily: 'var(--font-display), "Times New Roman", serif',
             fontSize: { xs: '1.15rem', md: '1.5rem' },
           }}
         >
