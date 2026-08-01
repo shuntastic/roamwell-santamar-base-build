@@ -1,0 +1,15 @@
+{
+  "name": "santamar",
+  "private": true,
+  "description": "Santa Mar website framework — Next.js frontend + Strapi CMS",
+  "engines": {
+    "node": ">=20 <21"
+  },
+  "scripts": {
+    "dev:cms": "npm run develop --prefix cms",
+    "dev:web": "npm run dev --prefix frontend",
+    "build:cms": "npm run build --prefix cms",
+    "build:web": "npm run build --prefix frontend",
+    "storybook": "npm run storybook --prefix frontend"
+  }
+}

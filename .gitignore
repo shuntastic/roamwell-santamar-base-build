@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+.npm/
+.pnpm-store/
+
+# Env / secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+!**/.env.example
+
+# Local notes / credentials (never commit)
+_assets/
+
+# Builds / caches
+.next/
+out/
+dist/
+build/
+.strapi/
+.tmp/
+coverage/
+*.tsbuildinfo
+storybook-static/
+*.log
+debug-storybook.log
+*storybook.log
+
+# Uploads (keep placeholder only)
+cms/public/uploads/*
+!cms/public/uploads/.gitkeep
+
+# GSAP extracted vendor copy (install from gsap-bonus.tgz)
+frontend/vendor/
+frontend/gsap-bonus.tgz
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Package manager noise
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
