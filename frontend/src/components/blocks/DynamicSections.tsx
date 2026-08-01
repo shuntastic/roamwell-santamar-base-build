@@ -1,8 +1,11 @@
+'use client';
+
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material/styles';
 import type { PageSection } from '@/types/cms';
 import { getStrapiMediaUrl } from '@/lib/strapi';
 import { StyledCopy } from '@/components/ui/StyledCopy';
@@ -11,6 +14,7 @@ import { HeroBlock } from '@/components/blocks/HeroBlock';
 import { ContactFormBlock } from '@/components/blocks/ContactFormBlock';
 import { SectionReveal } from '@/components/blocks/SectionReveal';
 import { LinkButton } from '@/components/ui/LinkButton';
+import { ThemeSection } from '@/components/layout/ThemeSection';
 
 type Props = {
   sections?: PageSection[] | null;
@@ -18,6 +22,8 @@ type Props = {
 };
 
 export function DynamicSections({ sections, locale }: Props) {
+  const theme = useTheme();
+
   if (!sections?.length) return null;
 
   return (
@@ -30,21 +36,21 @@ export function DynamicSections({ sections, locale }: Props) {
           case 'blocks.rich-text':
             return (
               <SectionReveal key={`${section.__component}-${section.id}`}>
-                <Container maxWidth="md" sx={{ py: { xs: 6, md: 10 } }}>
+                <ThemeSection narrow>
                   {section.title ? (
                     <Typography variant="h2" sx={{ mb: 3 }}>
                       {section.title}
                     </Typography>
                   ) : null}
                   <StyledCopy content={section.body} />
-                </Container>
+                </ThemeSection>
               </SectionReveal>
             );
 
           case 'blocks.feature-grid':
             return (
               <SectionReveal key={`${section.__component}-${section.id}`}>
-                <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 } }}>
+                <ThemeSection>
                   {section.title ? (
                     <Typography variant="h2" sx={{ mb: 1.5 }}>
                       {section.title}
@@ -72,6 +78,7 @@ export function DynamicSections({ sections, locale }: Props) {
                                   objectFit: 'cover',
                                   mb: 2,
                                   display: 'block',
+                                  borderRadius: `${theme.layout.cardRadius}px`,
                                 }}
                               />
                             ) : null}
@@ -101,7 +108,7 @@ export function DynamicSections({ sections, locale }: Props) {
                       );
                     })}
                   </Grid>
-                </Container>
+                </ThemeSection>
               </SectionReveal>
             );
 
@@ -115,7 +122,7 @@ export function DynamicSections({ sections, locale }: Props) {
           case 'blocks.location-map':
             return (
               <SectionReveal key={`${section.__component}-${section.id}`}>
-                <Container maxWidth="lg" sx={{ py: { xs: 6, md: 10 } }}>
+                <ThemeSection>
                   {section.title ? (
                     <Typography variant="h2" sx={{ mb: 2 }}>
                       {section.title}
@@ -131,16 +138,22 @@ export function DynamicSections({ sections, locale }: Props) {
                       component="iframe"
                       title={section.title || 'Map'}
                       src={section.mapEmbedUrl}
-                      sx={{ width: '100%', height: { xs: 280, md: 420 }, border: 0 }}
+                      sx={{
+                        width: '100%',
+                        height: { xs: 280, md: 420 },
+                        border: 0,
+                        borderRadius: `${theme.layout.cardRadius}px`,
+                      }}
                       loading="lazy"
                     />
                   ) : (
                     <Box
                       sx={{
                         height: { xs: 240, md: 360 },
-                        bgcolor: 'rgba(11,79,108,0.08)',
+                        bgcolor: 'action.hover',
                         display: 'grid',
                         placeItems: 'center',
+                        borderRadius: `${theme.layout.cardRadius}px`,
                       }}
                     >
                       <Typography color="text.secondary">
@@ -159,7 +172,7 @@ export function DynamicSections({ sections, locale }: Props) {
                       {section.directionsLabel || 'Get Directions'}
                     </Button>
                   ) : null}
-                </Container>
+                </ThemeSection>
               </SectionReveal>
             );
 
@@ -169,11 +182,11 @@ export function DynamicSections({ sections, locale }: Props) {
                 <Box
                   sx={{
                     position: 'relative',
-                    py: { xs: 8, md: 12 },
+                    py: theme.layout.sectionPaddingY,
                     color: 'primary.contrastText',
                     backgroundImage: section.backgroundImage
-                      ? `linear-gradient(120deg, rgba(7,58,80,0.88), rgba(11,79,108,0.72)), url(${getStrapiMediaUrl(section.backgroundImage.url)})`
-                      : 'linear-gradient(120deg, #073A50, #0B4F6C 55%, #C45C26)',
+                      ? `linear-gradient(120deg, ${theme.palette.primary.dark}e0, ${theme.palette.primary.main}b8), url(${getStrapiMediaUrl(section.backgroundImage.url)})`
+                      : `linear-gradient(120deg, ${theme.palette.primary.dark}, ${theme.palette.primary.main} 55%, ${theme.palette.secondary.main})`,
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}
@@ -205,7 +218,7 @@ export function DynamicSections({ sections, locale }: Props) {
             const posterUrl = getStrapiMediaUrl(section.poster?.url);
             return (
               <SectionReveal key={`${section.__component}-${section.id}`}>
-                <Container maxWidth="md" sx={{ py: { xs: 6, md: 10 } }}>
+                <ThemeSection narrow>
                   {section.title ? (
                     <Typography variant="h2" sx={{ mb: 2 }}>
                       {section.title}
@@ -216,7 +229,12 @@ export function DynamicSections({ sections, locale }: Props) {
                       component="iframe"
                       title={section.title || 'Video'}
                       src={section.videoUrl}
-                      sx={{ width: '100%', aspectRatio: '16 / 9', border: 0 }}
+                      sx={{
+                        width: '100%',
+                        aspectRatio: '16 / 9',
+                        border: 0,
+                        borderRadius: `${theme.layout.cardRadius}px`,
+                      }}
                       allowFullScreen
                     />
                   ) : fileUrl ? (
@@ -225,7 +243,11 @@ export function DynamicSections({ sections, locale }: Props) {
                       controls
                       poster={posterUrl ?? undefined}
                       src={fileUrl}
-                      sx={{ width: '100%', display: 'block' }}
+                      sx={{
+                        width: '100%',
+                        display: 'block',
+                        borderRadius: `${theme.layout.cardRadius}px`,
+                      }}
                     />
                   ) : null}
                   {section.caption ? (
@@ -233,7 +255,7 @@ export function DynamicSections({ sections, locale }: Props) {
                       {section.caption}
                     </Typography>
                   ) : null}
-                </Container>
+                </ThemeSection>
               </SectionReveal>
             );
           }

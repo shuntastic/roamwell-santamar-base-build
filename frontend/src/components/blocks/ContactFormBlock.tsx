@@ -3,10 +3,10 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import type { BlocksContactForm } from '@/types/cms';
+import { ThemeSection } from '@/components/layout/ThemeSection';
 
 type Props = {
   block: BlocksContactForm;
@@ -16,7 +16,7 @@ export function ContactFormBlock({ block }: Props) {
   const [submitted, setSubmitted] = React.useState(false);
 
   return (
-    <Container maxWidth="sm" sx={{ py: { xs: 6, md: 10 } }}>
+    <ThemeSection narrow>
       {block.title ? (
         <Typography variant="h2" sx={{ mb: 1.5 }}>
           {block.title}
@@ -37,7 +37,7 @@ export function ContactFormBlock({ block }: Props) {
             event.preventDefault();
             setSubmitted(true);
           }}
-          sx={{ display: 'grid', gap: 2 }}
+          sx={{ display: 'grid', gap: 2, maxWidth: 520 }}
         >
           <TextField name="name" label="Name" required fullWidth />
           <TextField name="email" type="email" label="Email" required fullWidth />
@@ -47,6 +47,6 @@ export function ContactFormBlock({ block }: Props) {
           </Button>
         </Box>
       )}
-    </Container>
+    </ThemeSection>
   );
 }

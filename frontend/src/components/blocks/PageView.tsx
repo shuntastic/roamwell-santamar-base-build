@@ -1,11 +1,13 @@
+'use client';
+
 import Box from '@mui/material/Box';
-import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import type { CmsPage } from '@/types/cms';
 import { StyledCopy } from '@/components/ui/StyledCopy';
 import { Slideshow } from '@/components/slideshow/Slideshow';
 import { DynamicSections } from '@/components/blocks/DynamicSections';
 import { SectionReveal } from '@/components/blocks/SectionReveal';
+import { ThemeSection } from '@/components/layout/ThemeSection';
 
 type Props = {
   page: CmsPage;
@@ -21,7 +23,7 @@ export function PageView({ page, locale }: Props) {
 
       {!hasHero ? (
         <SectionReveal>
-          <Container maxWidth="md" sx={{ pt: { xs: 6, md: 10 }, pb: 2 }}>
+          <ThemeSection narrow sx={{ pb: 2 }}>
             <Typography
               variant="h1"
               sx={{ fontSize: { xs: '2.6rem', md: '3.8rem' }, color: 'primary.main', mb: 3 }}
@@ -29,13 +31,13 @@ export function PageView({ page, locale }: Props) {
               {page.title}
             </Typography>
             <StyledCopy content={page.styledCopy} />
-          </Container>
+          </ThemeSection>
         </SectionReveal>
       ) : page.styledCopy ? (
         <SectionReveal>
-          <Container maxWidth="md" sx={{ py: { xs: 6, md: 8 } }}>
+          <ThemeSection narrow>
             <StyledCopy content={page.styledCopy} />
-          </Container>
+          </ThemeSection>
         </SectionReveal>
       ) : null}
 
