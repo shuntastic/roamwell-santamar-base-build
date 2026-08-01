@@ -1,0 +1,29 @@
+{
+  "collectionName": "components_media_slideshows",
+  "info": {
+    "displayName": "Slideshow",
+    "description": "Ordered slideshow of images or videos with captions",
+    "icon": "landscape"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "autoplay": {
+      "type": "boolean",
+      "default": true
+    },
+    "intervalMs": {
+      "type": "integer",
+      "default": 5000,
+      "min": 1000
+    },
+    "slides": {
+      "type": "component",
+      "repeatable": true,
+      "component": "media.slide",
+      "required": true
+    }
+  }
+}

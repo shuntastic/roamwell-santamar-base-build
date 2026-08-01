@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blocks_rich_texts",
+  "info": {
+    "displayName": "Rich Text",
+    "description": "Styled copy block for long-form content",
+    "icon": "write"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "body": {
+      "type": "blocks",
+      "required": true
+    }
+  }
+}

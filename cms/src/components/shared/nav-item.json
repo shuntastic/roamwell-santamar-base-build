@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_shared_nav_items",
+  "info": {
+    "displayName": "Nav Item",
+    "description": "Primary navigation item",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "url": {
+      "type": "string",
+      "required": true
+    },
+    "page": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::page.page"
+    },
+    "order": {
+      "type": "integer",
+      "default": 0
+    }
+  }
+}

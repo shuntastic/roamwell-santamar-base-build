@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_blocks_video_embeds",
+  "info": {
+    "displayName": "Video Embed",
+    "description": "External or uploaded video with caption",
+    "icon": "play"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "caption": {
+      "type": "text"
+    },
+    "videoUrl": {
+      "type": "string"
+    },
+    "videoFile": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["videos"]
+    },
+    "poster": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_blocks_feature_grids",
+  "info": {
+    "displayName": "Feature Grid",
+    "description": "Grid of feature cards for accommodations, activities, etc.",
+    "icon": "grid"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "intro": {
+      "type": "text"
+    },
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "blocks.feature-item"
+    }
+  }
+}

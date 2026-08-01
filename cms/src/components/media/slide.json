@@ -1,0 +1,23 @@
+{
+  "collectionName": "components_media_slides",
+  "info": {
+    "displayName": "Slide",
+    "description": "Single slideshow item with image or video and caption",
+    "icon": "picture"
+  },
+  "options": {},
+  "attributes": {
+    "media": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images", "videos"]
+    },
+    "caption": {
+      "type": "text"
+    },
+    "altText": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_blocks_contact_forms",
+  "info": {
+    "displayName": "Contact Form",
+    "description": "Contact form configuration (EN/ES/PT copy via page locale)",
+    "icon": "envelope"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "intro": {
+      "type": "text"
+    },
+    "submitLabel": {
+      "type": "string",
+      "default": "Send Message"
+    },
+    "successMessage": {
+      "type": "string",
+      "default": "Thank you. We will be in touch soon."
+    },
+    "recipientEmail": {
+      "type": "email"
+    }
+  }
+}
