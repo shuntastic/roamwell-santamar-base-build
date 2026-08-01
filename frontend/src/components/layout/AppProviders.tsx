@@ -2,9 +2,8 @@
 
 import * as React from 'react';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import { theme } from '@/theme/theme';
+import { AppThemeProvider } from '@/theme/ThemeContext';
+import { ThemeSwitcher } from '@/components/layout/ThemeSwitcher';
 
 type Props = {
   children: React.ReactNode;
@@ -13,10 +12,10 @@ type Props = {
 export function AppProviders({ children }: Props) {
   return (
     <AppRouterCacheProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+      <AppThemeProvider>
         {children}
-      </ThemeProvider>
+        <ThemeSwitcher />
+      </AppThemeProvider>
     </AppRouterCacheProvider>
   );
 }

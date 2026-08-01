@@ -73,7 +73,22 @@ npm run dev
 
 Site: [http://localhost:3000](http://localhost:3000) → redirects to `/en`.
 
+### Theme switching (dev)
+
+Three visual themes share the same components and layout tokens (`theme.layout`):
+
+| ID | Character |
+| --- | --- |
+| `coastal` | Atlantic teal, glass header, pill CTAs (default) |
+| `harbor` | Ink & brass, solid header, squared chrome |
+| `dune` | Warm sand & olive, minimal header, soft editorial rhythm |
+
+Fonts: **Ledger** (headlines) + **Instrument Sans** (body).
+
+While developing, set `NEXT_PUBLIC_ENABLE_THEME_SWITCHER=true` in `frontend/.env.local`. Use the floating Theme dropdown (bottom-right), hide it with the ✕, and restore with **Alt+Shift+T**. Storybook exposes the same themes via the toolbar paintbrush control.
+
 ### 3. Storybook
+
 
 ```bash
 cd frontend

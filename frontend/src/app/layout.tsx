@@ -1,15 +1,16 @@
 import type { Metadata } from 'next';
-import { Fraunces, Outfit } from 'next/font/google';
+import { Instrument_Sans, Ledger } from 'next/font/google';
 import { AppProviders } from '@/components/layout/AppProviders';
 import './globals.css';
 
-const display = Fraunces({
+const display = Ledger({
   subsets: ['latin'],
+  weight: '400',
   variable: '--font-display',
   display: 'swap',
 });
 
-const body = Outfit({
+const body = Instrument_Sans({
   subsets: ['latin'],
   variable: '--font-body',
   display: 'swap',
