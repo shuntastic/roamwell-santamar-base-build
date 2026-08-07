@@ -38,6 +38,9 @@ const PAGE_POPULATE: Record<string, unknown> = {
         populate: ['backgroundMedia', 'cta'],
       },
       'blocks.rich-text': true,
+      'blocks.image-text': {
+        populate: ['image'],
+      },
       'blocks.feature-grid': {
         populate: {
           items: {

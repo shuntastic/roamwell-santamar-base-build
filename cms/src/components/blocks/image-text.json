@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_blocks_image_texts",
+  "info": {
+    "displayName": "Image & Text",
+    "description": "Split layout with image on the left and optional title, subheadline, and copy on the right",
+    "icon": "picture"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "subheadline": {
+      "type": "text"
+    },
+    "body": {
+      "type": "blocks"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"],
+      "required": true
+    }
+  }
+}
