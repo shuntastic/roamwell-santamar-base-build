@@ -110,6 +110,7 @@ export function getFallbackPage(slug: string, locale: Locale): CmsPage | null {
         id: 1,
         headline: 'Santamar',
         subheadline: meta.intro,
+        description: introBlocks,
         cta: {
           label: locale === 'es' ? 'Reservar' : locale === 'pt' ? 'Reservar' : 'Book Your Stay',
           url: '/book-your-stay',

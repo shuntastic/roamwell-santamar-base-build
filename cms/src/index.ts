@@ -205,6 +205,7 @@ async function ensurePages(strapi: Core.Strapi) {
                   __component: 'blocks.hero',
                   headline: 'Santamar',
                   subheadline: enCopy.intro,
+                  description: blocksIntro(enCopy.intro) as never,
                   cta: {
                     label: 'Book Your Stay',
                     url: '/book-your-stay',

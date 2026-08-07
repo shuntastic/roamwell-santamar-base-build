@@ -43,6 +43,7 @@ export type BlocksHero = {
   eyebrow?: string | null;
   headline: string;
   subheadline?: string | null;
+  description?: unknown;
   backgroundMedia?: StrapiMedia | null;
   cta?: StrapiLink | null;
 };

@@ -17,6 +17,9 @@
     "subheadline": {
       "type": "text"
     },
+    "description": {
+      "type": "blocks"
+    },
     "backgroundMedia": {
       "type": "media",
       "multiple": false,
