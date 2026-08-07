@@ -66,6 +66,7 @@
       "components": [
         "blocks.hero",
         "blocks.rich-text",
+        "blocks.image-text",
         "blocks.feature-grid",
         "blocks.media-gallery",
         "blocks.location-map",

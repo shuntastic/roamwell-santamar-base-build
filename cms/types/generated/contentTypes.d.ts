@@ -587,6 +587,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
       [
         'blocks.hero',
         'blocks.rich-text',
+        'blocks.image-text',
         'blocks.feature-grid',
         'blocks.media-gallery',
         'blocks.location-map',

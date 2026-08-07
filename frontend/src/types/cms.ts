@@ -55,6 +55,15 @@ export type BlocksRichText = {
   body: unknown;
 };
 
+export type BlocksImageText = {
+  __component: 'blocks.image-text';
+  id: number;
+  title?: string | null;
+  subheadline?: string | null;
+  body?: unknown;
+  image: StrapiMedia;
+};
+
 export type BlocksFeatureItem = {
   id?: number;
   title: string;
@@ -122,6 +131,7 @@ export type BlocksVideoEmbed = {
 export type PageSection =
   | BlocksHero
   | BlocksRichText
+  | BlocksImageText
   | BlocksFeatureGrid
   | BlocksMediaGallery
   | BlocksLocationMap

@@ -81,6 +81,21 @@ export interface BlocksHero extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksImageText extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_image_texts';
+  info: {
+    description: 'Split layout with image on the left and optional title, subheadline, and copy on the right';
+    displayName: 'Image & Text';
+    icon: 'picture';
+  };
+  attributes: {
+    body: Schema.Attribute.Blocks;
+    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    subheadline: Schema.Attribute.Text;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksLocationMap extends Struct.ComponentSchema {
   collectionName: 'components_blocks_location_maps';
   info: {
@@ -238,6 +253,7 @@ declare module '@strapi/strapi' {
       'blocks.feature-grid': BlocksFeatureGrid;
       'blocks.feature-item': BlocksFeatureItem;
       'blocks.hero': BlocksHero;
+      'blocks.image-text': BlocksImageText;
       'blocks.location-map': BlocksLocationMap;
       'blocks.media-gallery': BlocksMediaGallery;
       'blocks.rich-text': BlocksRichText;

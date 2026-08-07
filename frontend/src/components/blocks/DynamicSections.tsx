@@ -11,6 +11,7 @@ import { getStrapiMediaUrl } from '@/lib/strapi';
 import { StyledCopy } from '@/components/ui/StyledCopy';
 import { Slideshow } from '@/components/slideshow/Slideshow';
 import { HeroBlock } from '@/components/blocks/HeroBlock';
+import { ImageTextBlock } from '@/components/blocks/ImageTextBlock';
 import { ContactFormBlock } from '@/components/blocks/ContactFormBlock';
 import { SectionReveal } from '@/components/blocks/SectionReveal';
 import { LinkButton } from '@/components/ui/LinkButton';
@@ -44,6 +45,13 @@ export function DynamicSections({ sections, locale }: Props) {
                   ) : null}
                   <StyledCopy content={section.body} />
                 </ThemeSection>
+              </SectionReveal>
+            );
+
+          case 'blocks.image-text':
+            return (
+              <SectionReveal key={`${section.__component}-${section.id}`}>
+                <ImageTextBlock block={section} />
               </SectionReveal>
             );
 
