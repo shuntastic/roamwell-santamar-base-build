@@ -10,6 +10,12 @@ export const localeLabels: Record<Locale, string> = {
   pt: 'PT',
 };
 
+export const localeNames: Record<Locale, string> = {
+  en: 'English',
+  es: 'Español',
+  pt: 'Português',
+};
+
 export function isLocale(value: string): value is Locale {
   return locales.includes(value as Locale);
 }
