@@ -25,7 +25,7 @@ export function HeroMotion({ children }: Props) {
       }
     }
 
-    fadeUpStagger(root.querySelectorAll('.hero-sub, .hero-cta'), { delay: 0.25 });
+    fadeUpStagger(root.querySelectorAll('.hero-sub, .hero-description, .hero-cta'), { delay: 0.25 });
   }, []);
 
   return <Box ref={rootRef}>{children}</Box>;

@@ -12,6 +12,17 @@ const meta = {
       eyebrow: 'Santamar',
       headline: 'Coastal calm, curated stays',
       subheadline: 'A hospitality framework powered by Strapi and Next.js.',
+      description: [
+        {
+          type: 'paragraph',
+          children: [
+            {
+              type: 'text',
+              text: 'Discover thoughtfully designed accommodations, local experiences, and effortless booking — all from one place.',
+            },
+          ],
+        },
+      ],
       cta: {
         label: 'Book Your Stay',
         url: '/book-your-stay',

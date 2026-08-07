@@ -8,6 +8,7 @@ import type { BlocksHero } from '@/types/cms';
 import { getStrapiMediaUrl } from '@/lib/strapi';
 import { HeroMotion } from '@/components/blocks/HeroMotion';
 import { LinkButton } from '@/components/ui/LinkButton';
+import { StyledCopy } from '@/components/ui/StyledCopy';
 
 type Props = {
   block: BlocksHero;
@@ -95,6 +96,19 @@ export function HeroBlock({ block, locale }: Props) {
             >
               {block.subheadline}
             </Typography>
+          ) : null}
+          {block.description ? (
+            <Box
+              className="hero-description"
+              sx={{
+                mt: 2,
+                maxWidth: 560,
+                opacity: 0.9,
+                fontSize: { xs: '0.98rem', md: '1.05rem' },
+              }}
+            >
+              <StyledCopy content={block.description} color="inherit" />
+            </Box>
           ) : null}
           {block.cta && href ? (
             <LinkButton

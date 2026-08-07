@@ -74,6 +74,7 @@ export interface BlocksHero extends Struct.ComponentSchema {
   attributes: {
     backgroundMedia: Schema.Attribute.Media<'images' | 'videos'>;
     cta: Schema.Attribute.Component<'shared.link', false>;
+    description: Schema.Attribute.Blocks;
     eyebrow: Schema.Attribute.String;
     headline: Schema.Attribute.String & Schema.Attribute.Required;
     subheadline: Schema.Attribute.Text;
