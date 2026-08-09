@@ -136,6 +136,23 @@ export interface BlocksMediaGallery extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksModalButton extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_modal_buttons';
+  info: {
+    description: 'Optional description with a button that opens a modal of rich HTML copy';
+    displayName: 'Modal Button';
+    icon: 'expand';
+  };
+  attributes: {
+    buttonLabel: Schema.Attribute.String & Schema.Attribute.Required;
+    buttonVariant: Schema.Attribute.Enumeration<['primary', 'secondary', 'text']> &
+      Schema.Attribute.DefaultTo<'primary'>;
+    description: Schema.Attribute.Text;
+    modalContent: Schema.Attribute.Blocks & Schema.Attribute.Required;
+    modalTitle: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksRichText extends Struct.ComponentSchema {
   collectionName: 'components_blocks_rich_texts';
   info: {
@@ -265,6 +282,7 @@ declare module '@strapi/strapi' {
       'blocks.image-text': BlocksImageText;
       'blocks.location-map': BlocksLocationMap;
       'blocks.media-gallery': BlocksMediaGallery;
+      'blocks.modal-button': BlocksModalButton;
       'blocks.rich-text': BlocksRichText;
       'blocks.video-embed': BlocksVideoEmbed;
       'media.slide': MediaSlide;
