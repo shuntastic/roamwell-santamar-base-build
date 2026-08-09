@@ -63,6 +63,7 @@ const PAGE_POPULATE: Record<string, unknown> = {
       'blocks.booking-cta': {
         populate: ['backgroundImage'],
       },
+      'blocks.booking-calendar': true,
       'blocks.contact-form': true,
       'blocks.modal-button': true,
       'blocks.video-embed': {
