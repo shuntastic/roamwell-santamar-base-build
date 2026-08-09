@@ -2,7 +2,7 @@
   "collectionName": "components_blocks_image_texts",
   "info": {
     "displayName": "Image & Text",
-    "description": "Split layout with image on the left and optional title, subheadline, and copy on the right",
+    "description": "Split layout with one or more images on the left and optional title, subheadline, and copy on the right",
     "icon": "picture"
   },
   "options": {},
@@ -16,11 +16,20 @@
     "body": {
       "type": "blocks"
     },
-    "image": {
+    "images": {
       "type": "media",
-      "multiple": false,
+      "multiple": true,
       "allowedTypes": ["images"],
       "required": true
+    },
+    "autoplay": {
+      "type": "boolean",
+      "default": false
+    },
+    "intervalMs": {
+      "type": "integer",
+      "default": 5000,
+      "min": 1000
     }
   }
 }

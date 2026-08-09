@@ -84,13 +84,22 @@ export interface BlocksHero extends Struct.ComponentSchema {
 export interface BlocksImageText extends Struct.ComponentSchema {
   collectionName: 'components_blocks_image_texts';
   info: {
-    description: 'Split layout with image on the left and optional title, subheadline, and copy on the right';
+    description: 'Split layout with one or more images on the left and optional title, subheadline, and copy on the right';
     displayName: 'Image & Text';
     icon: 'picture';
   };
   attributes: {
+    autoplay: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     body: Schema.Attribute.Blocks;
-    image: Schema.Attribute.Media<'images'> & Schema.Attribute.Required;
+    images: Schema.Attribute.Media<'images', true> & Schema.Attribute.Required;
+    intervalMs: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1000;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<5000>;
     subheadline: Schema.Attribute.Text;
     title: Schema.Attribute.String;
   };
