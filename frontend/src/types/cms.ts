@@ -61,7 +61,9 @@ export type BlocksImageText = {
   title?: string | null;
   subheadline?: string | null;
   body?: unknown;
-  image: StrapiMedia;
+  images: StrapiMedia[];
+  autoplay?: boolean | null;
+  intervalMs?: number | null;
 };
 
 export type BlocksFeatureItem = {

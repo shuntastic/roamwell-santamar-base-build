@@ -39,7 +39,7 @@ const PAGE_POPULATE: Record<string, unknown> = {
       },
       'blocks.rich-text': true,
       'blocks.image-text': {
-        populate: ['image'],
+        populate: ['images'],
       },
       'blocks.feature-grid': {
         populate: {
