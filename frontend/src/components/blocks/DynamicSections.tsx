@@ -14,6 +14,7 @@ import { HeroBlock } from '@/components/blocks/HeroBlock';
 import { ImageTextBlock } from '@/components/blocks/ImageTextBlock';
 import { ContactFormBlock } from '@/components/blocks/ContactFormBlock';
 import { ModalButtonBlock } from '@/components/blocks/ModalButtonBlock';
+import { BookingCalendarBlock } from '@/components/blocks/BookingCalendarBlock';
 import { SectionReveal } from '@/components/blocks/SectionReveal';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { ThemeSection } from '@/components/layout/ThemeSection';
@@ -212,6 +213,13 @@ export function DynamicSections({ sections, locale }: Props) {
                     </LinkButton>
                   </Container>
                 </Box>
+              </SectionReveal>
+            );
+
+          case 'blocks.booking-calendar':
+            return (
+              <SectionReveal key={`${section.__component}-${section.id}`}>
+                <BookingCalendarBlock block={section} />
               </SectionReveal>
             );
 

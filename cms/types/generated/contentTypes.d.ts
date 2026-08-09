@@ -592,6 +592,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.media-gallery',
         'blocks.location-map',
         'blocks.booking-cta',
+        'blocks.booking-calendar',
         'blocks.contact-form',
         'blocks.modal-button',
         'blocks.video-embed',

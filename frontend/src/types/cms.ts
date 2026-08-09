@@ -110,6 +110,25 @@ export type BlocksBookingCta = {
   backgroundImage?: StrapiMedia | null;
 };
 
+export type BlocksBookingCalendar = {
+  __component: 'blocks.booking-calendar';
+  id: number;
+  title?: string | null;
+  cloudfrontSubdomain: string;
+  baseUrl: string;
+  listingId: number;
+  numberOfMonths?: '1' | '2' | null;
+  openInNewTab?: boolean | null;
+  buttonAction?: 'checkout' | 'inquiry' | null;
+  buttonText?: string | null;
+  clearButtonText?: string | null;
+  font?: string | null;
+  rounded?: boolean | null;
+  mainColor?: string | null;
+  frameColor?: string | null;
+  textColor?: string | null;
+};
+
 export type BlocksContactForm = {
   __component: 'blocks.contact-form';
   id: number;
@@ -148,6 +167,7 @@ export type PageSection =
   | BlocksMediaGallery
   | BlocksLocationMap
   | BlocksBookingCta
+  | BlocksBookingCalendar
   | BlocksContactForm
   | BlocksModalButton
   | BlocksVideoEmbed;
