@@ -1,0 +1,30 @@
+{
+  "collectionName": "components_blocks_modal_buttons",
+  "info": {
+    "displayName": "Modal Button",
+    "description": "Optional description with a button that opens a modal of rich HTML copy",
+    "icon": "expand"
+  },
+  "options": {},
+  "attributes": {
+    "description": {
+      "type": "text"
+    },
+    "buttonLabel": {
+      "type": "string",
+      "required": true
+    },
+    "buttonVariant": {
+      "type": "enumeration",
+      "enum": ["primary", "secondary", "text"],
+      "default": "primary"
+    },
+    "modalTitle": {
+      "type": "string"
+    },
+    "modalContent": {
+      "type": "blocks",
+      "required": true
+    }
+  }
+}

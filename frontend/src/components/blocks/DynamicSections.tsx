@@ -13,6 +13,7 @@ import { Slideshow } from '@/components/slideshow/Slideshow';
 import { HeroBlock } from '@/components/blocks/HeroBlock';
 import { ImageTextBlock } from '@/components/blocks/ImageTextBlock';
 import { ContactFormBlock } from '@/components/blocks/ContactFormBlock';
+import { ModalButtonBlock } from '@/components/blocks/ModalButtonBlock';
 import { SectionReveal } from '@/components/blocks/SectionReveal';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { ThemeSection } from '@/components/layout/ThemeSection';
@@ -218,6 +219,13 @@ export function DynamicSections({ sections, locale }: Props) {
             return (
               <SectionReveal key={`${section.__component}-${section.id}`}>
                 <ContactFormBlock block={section} />
+              </SectionReveal>
+            );
+
+          case 'blocks.modal-button':
+            return (
+              <SectionReveal key={`${section.__component}-${section.id}`}>
+                <ModalButtonBlock block={section} />
               </SectionReveal>
             );
 

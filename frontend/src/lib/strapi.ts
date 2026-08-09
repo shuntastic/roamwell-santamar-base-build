@@ -64,6 +64,7 @@ const PAGE_POPULATE: Record<string, unknown> = {
         populate: ['backgroundImage'],
       },
       'blocks.contact-form': true,
+      'blocks.modal-button': true,
       'blocks.video-embed': {
         populate: ['videoFile', 'poster'],
       },

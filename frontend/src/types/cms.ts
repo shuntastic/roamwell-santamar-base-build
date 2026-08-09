@@ -120,6 +120,16 @@ export type BlocksContactForm = {
   recipientEmail?: string | null;
 };
 
+export type BlocksModalButton = {
+  __component: 'blocks.modal-button';
+  id: number;
+  description?: string | null;
+  buttonLabel: string;
+  buttonVariant?: 'primary' | 'secondary' | 'text' | null;
+  modalTitle?: string | null;
+  modalContent: unknown;
+};
+
 export type BlocksVideoEmbed = {
   __component: 'blocks.video-embed';
   id: number;
@@ -139,6 +149,7 @@ export type PageSection =
   | BlocksLocationMap
   | BlocksBookingCta
   | BlocksContactForm
+  | BlocksModalButton
   | BlocksVideoEmbed;
 
 export type CmsPage = {
