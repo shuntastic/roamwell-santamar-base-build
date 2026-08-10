@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { Instrument_Sans, Ledger } from 'next/font/google';
+import { Bentham, Instrument_Sans } from 'next/font/google';
 import { AppProviders } from '@/components/layout/AppProviders';
 import './globals.css';
 
-const display = Ledger({
+const display = Bentham({
   subsets: ['latin'],
   weight: '400',
   variable: '--font-display',

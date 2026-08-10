@@ -83,7 +83,7 @@ Three visual themes share the same components and layout tokens (`theme.layout`)
 | `harbor` | Ink & brass, solid header, squared chrome |
 | `dune` | Warm sand & olive, minimal header, soft editorial rhythm |
 
-Fonts: **Ledger** (headlines) + **Instrument Sans** (body).
+Fonts: **[Bentham](https://fonts.google.com/specimen/Bentham)** (headlines) + **Instrument Sans** (body).
 
 While developing, set `NEXT_PUBLIC_ENABLE_THEME_SWITCHER=true` in `frontend/.env.local`. Use the floating Theme dropdown (bottom-right), hide it with the ✕, and restore with **Alt+Shift+T**. Storybook exposes the same themes via the toolbar paintbrush control.
 
