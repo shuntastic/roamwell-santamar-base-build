@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import { alpha } from '@mui/material/styles';
 import type { StrapiSlideshow } from '@/types/cms';
 import { getStrapiMediaUrl } from '@/lib/strapi';
 
@@ -137,32 +138,32 @@ export function Slideshow({ slideshow, transitionMs = 1000 }: Props) {
           <IconButton
             aria-label="Previous slide"
             onClick={goPrev}
-            sx={{
+            sx={(theme) => ({
               position: 'absolute',
               left: 8,
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 2,
-              color: 'inherit',
-              bgcolor: 'rgba(255,255,255,0.12)',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.22)' },
-            }}
+              color: 'common.white',
+              bgcolor: alpha(theme.palette.secondary.main, 1.0),
+              '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.78) },
+            })}
           >
             <ChevronLeftIcon />
           </IconButton>
           <IconButton
             aria-label="Next slide"
             onClick={goNext}
-            sx={{
+            sx={(theme) => ({
               position: 'absolute',
               right: 8,
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 2,
-              color: 'inherit',
-              bgcolor: 'rgba(255,255,255,0.12)',
-              '&:hover': { bgcolor: 'rgba(255,255,255,0.22)' },
-            }}
+              color: 'common.white',
+              bgcolor: alpha(theme.palette.secondary.main, 1.0),
+              '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.78) },
+            })}
           >
             <ChevronRightIcon />
           </IconButton>
