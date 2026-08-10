@@ -413,6 +413,9 @@ export default {
   register() {},
 
   async bootstrap({ strapi }: { strapi: Core.Strapi }) {
+    // Always ensure public Content API access — required even when seed is skipped in prod.
+    await ensurePublicPermissions(strapi);
+
     if (process.env.SEED_CONTENT === 'false') {
       return;
     }
@@ -422,7 +425,6 @@ export default {
       await ensurePages(strapi);
       await ensureNavigation(strapi);
       await ensureGlobal(strapi);
-      await ensurePublicPermissions(strapi);
     } catch (error) {
       strapi.log.error('[seed] Failed to seed CMS framework content');
       strapi.log.error(error);
