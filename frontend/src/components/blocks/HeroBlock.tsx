@@ -78,7 +78,7 @@ export function HeroBlock({ block, locale }: Props) {
       >
         <HeroMotion>
           {block.eyebrow ? (
-            <Typography variant="overline" sx={{ letterSpacing: '0.18em', opacity: 1.0, fontSize: '1.0rem', textShadow: '0 0 6px rgba(0, 0, 0, 0.5)' }}>
+            <Typography variant="overline" sx={{ letterSpacing: '0.18em', opacity: 1.0, fontSize: '0.85rem', textShadow: '0 0 6px rgba(0, 0, 0, 0.5)' }}>
               {block.eyebrow}
             </Typography>
           ) : null}
