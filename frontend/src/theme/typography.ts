@@ -1,6 +1,6 @@
 import type { ThemeOptions } from '@mui/material/styles';
 
-/** Shared type ramp — Ledger (display) + Instrument Sans (body). */
+/** Shared type ramp — Bentham (display) + Instrument Sans (body). */
 export const sharedTypography: ThemeOptions['typography'] = {
   fontFamily: 'var(--font-body), "Helvetica Neue", Arial, sans-serif',
   h1: {
