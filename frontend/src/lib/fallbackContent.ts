@@ -127,6 +127,11 @@ export function getFallbackPage(slug: string, locale: Locale): CmsPage | null {
         id: 1,
         title: meta.title,
         intro: meta.intro,
+        image: {
+          id: 1,
+          url: 'https://images.unsplash.com/photo-1499793983690-e8b21ccb4c95?auto=format&fit=crop&w=1200&q=80',
+          alternativeText: 'Coastal porch with morning light',
+        },
         submitLabel: locale === 'es' ? 'Enviar' : locale === 'pt' ? 'Enviar' : 'Send Message',
         successMessage:
           locale === 'es'

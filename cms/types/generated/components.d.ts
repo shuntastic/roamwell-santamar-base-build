@@ -51,11 +51,12 @@ export interface BlocksBookingCta extends Struct.ComponentSchema {
 export interface BlocksContactForm extends Struct.ComponentSchema {
   collectionName: 'components_blocks_contact_forms';
   info: {
-    description: 'Contact form configuration (EN/ES/PT copy via page locale)';
+    description: 'Split contact section with image on the left and form on the right (EN/ES/PT copy via page locale)';
     displayName: 'Contact Form';
     icon: 'envelope';
   };
   attributes: {
+    image: Schema.Attribute.Media<'images'>;
     intro: Schema.Attribute.Text;
     recipientEmail: Schema.Attribute.Email;
     submitLabel: Schema.Attribute.String &
