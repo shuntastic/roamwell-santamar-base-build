@@ -557,7 +557,7 @@ export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
 export interface ApiPagePage extends Struct.CollectionTypeSchema {
   collectionName: 'pages';
   info: {
-    description: 'CMS-managed site page with title, styled copy, slideshows, and custom components';
+    description: 'CMS-managed site page with dynamic sections and SEO';
     displayName: 'Page';
     pluralName: 'pages';
     singularName: 'page';
