@@ -67,6 +67,7 @@ export function HeroBlock({ block, locale }: Props) {
             sx={{
               position: 'absolute',
               inset: 0,
+              // background: `linear-gradient(180deg, #fbcc3400 50%, #fbcc3424 80%, #fbcc345e 100%)`,
               background: `linear-gradient(180deg, ${theme.palette.primary.dark}40 75%, ${theme.palette.primary.dark}b8 90%, ${theme.palette.primary.dark}e0 100%)`,
             }}
           />
