@@ -56,6 +56,13 @@ export type BlocksRichText = {
   body: unknown;
 };
 
+export type BlocksStatement = {
+  __component: 'blocks.statement';
+  id: number;
+  title: string;
+  body?: string | null;
+};
+
 export type BlocksImageText = {
   __component: 'blocks.image-text';
   id: number;
@@ -163,6 +170,7 @@ export type BlocksVideoEmbed = {
 export type PageSection =
   | BlocksHero
   | BlocksRichText
+  | BlocksStatement
   | BlocksImageText
   | BlocksFeatureGrid
   | BlocksMediaGallery

@@ -1,22 +1,5 @@
 import type { Schema, Struct } from '@strapi/strapi';
 
-export interface BlocksBookingCta extends Struct.ComponentSchema {
-  collectionName: 'components_blocks_booking_ctas';
-  info: {
-    description: 'Call-to-action for Book Your Stay';
-    displayName: 'Booking CTA';
-    icon: 'calendar';
-  };
-  attributes: {
-    backgroundImage: Schema.Attribute.Media<'images'>;
-    body: Schema.Attribute.Text;
-    bookingUrl: Schema.Attribute.String & Schema.Attribute.Required;
-    buttonLabel: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'Book Your Stay'>;
-    headline: Schema.Attribute.String & Schema.Attribute.Required;
-  };
-}
-
 export interface BlocksBookingCalendar extends Struct.ComponentSchema {
   collectionName: 'components_blocks_booking_calendars';
   info: {
@@ -28,7 +11,8 @@ export interface BlocksBookingCalendar extends Struct.ComponentSchema {
     baseUrl: Schema.Attribute.String & Schema.Attribute.Required;
     buttonAction: Schema.Attribute.Enumeration<['checkout', 'inquiry']> &
       Schema.Attribute.DefaultTo<'checkout'>;
-    buttonText: Schema.Attribute.String & Schema.Attribute.DefaultTo<'Book now'>;
+    buttonText: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Book now'>;
     clearButtonText: Schema.Attribute.String &
       Schema.Attribute.DefaultTo<'Clear dates'>;
     cloudfrontSubdomain: Schema.Attribute.String &
@@ -44,6 +28,23 @@ export interface BlocksBookingCalendar extends Struct.ComponentSchema {
     rounded: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     textColor: Schema.Attribute.String;
     title: Schema.Attribute.String;
+  };
+}
+
+export interface BlocksBookingCta extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_booking_ctas';
+  info: {
+    description: 'Call-to-action for Book Your Stay';
+    displayName: 'Booking CTA';
+    icon: 'calendar';
+  };
+  attributes: {
+    backgroundImage: Schema.Attribute.Media<'images'>;
+    body: Schema.Attribute.Text;
+    bookingUrl: Schema.Attribute.String & Schema.Attribute.Required;
+    buttonLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Book Your Stay'>;
+    headline: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -176,7 +177,9 @@ export interface BlocksModalButton extends Struct.ComponentSchema {
   };
   attributes: {
     buttonLabel: Schema.Attribute.String & Schema.Attribute.Required;
-    buttonVariant: Schema.Attribute.Enumeration<['primary', 'secondary', 'text']> &
+    buttonVariant: Schema.Attribute.Enumeration<
+      ['primary', 'secondary', 'text']
+    > &
       Schema.Attribute.DefaultTo<'primary'>;
     description: Schema.Attribute.Text;
     modalContent: Schema.Attribute.Blocks & Schema.Attribute.Required;
@@ -194,6 +197,19 @@ export interface BlocksRichText extends Struct.ComponentSchema {
   attributes: {
     body: Schema.Attribute.Blocks & Schema.Attribute.Required;
     title: Schema.Attribute.String;
+  };
+}
+
+export interface BlocksStatement extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_statements';
+  info: {
+    description: 'Centered statement text used as a section divider';
+    displayName: 'Statement';
+    icon: 'quote';
+  };
+  attributes: {
+    body: Schema.Attribute.Text;
+    title: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -305,8 +321,8 @@ export interface SharedSeo extends Struct.ComponentSchema {
 declare module '@strapi/strapi' {
   export namespace Public {
     export interface ComponentSchemas {
-      'blocks.booking-cta': BlocksBookingCta;
       'blocks.booking-calendar': BlocksBookingCalendar;
+      'blocks.booking-cta': BlocksBookingCta;
       'blocks.contact-form': BlocksContactForm;
       'blocks.feature-grid': BlocksFeatureGrid;
       'blocks.feature-item': BlocksFeatureItem;
@@ -316,6 +332,7 @@ declare module '@strapi/strapi' {
       'blocks.media-gallery': BlocksMediaGallery;
       'blocks.modal-button': BlocksModalButton;
       'blocks.rich-text': BlocksRichText;
+      'blocks.statement': BlocksStatement;
       'blocks.video-embed': BlocksVideoEmbed;
       'media.slide': MediaSlide;
       'media.slideshow': MediaSlideshow;
