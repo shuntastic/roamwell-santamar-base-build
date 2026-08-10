@@ -68,6 +68,14 @@
         }
       }
     },
+    "instagramUrl": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": false
+        }
+      }
+    },
     "defaultSeo": {
       "type": "component",
       "repeatable": false,

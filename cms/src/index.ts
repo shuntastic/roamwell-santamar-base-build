@@ -343,6 +343,7 @@ async function ensureGlobal(strapi: Core.Strapi) {
       contactEmail: 'hello@santamar.example',
       contactPhone: '+1 000 000 0000',
       address: 'Santamar',
+      instagramUrl: 'https://www.instagram.com/',
       defaultSeo: {
         metaTitle: 'Santamar',
         metaDescription: 'Coastal hospitality with accommodations, local experiences, and easy booking.',

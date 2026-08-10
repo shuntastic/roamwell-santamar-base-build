@@ -213,5 +213,6 @@ export type GlobalSettings = {
   contactEmail?: string | null;
   contactPhone?: string | null;
   address?: string | null;
+  instagramUrl?: string | null;
   defaultSeo?: StrapiSeo | null;
 };
