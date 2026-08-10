@@ -107,6 +107,7 @@ export interface BlocksHero extends Struct.ComponentSchema {
     description: Schema.Attribute.Blocks;
     eyebrow: Schema.Attribute.String;
     headline: Schema.Attribute.String & Schema.Attribute.Required;
+    showGradient: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
     subheadline: Schema.Attribute.Text;
   };
 }
