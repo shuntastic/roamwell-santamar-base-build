@@ -40,7 +40,7 @@ export function DynamicSections({ sections, locale }: Props) {
           case 'blocks.rich-text':
             return (
               <SectionReveal key={`${section.__component}-${section.id}`}>
-                <ThemeSection narrow>
+                <ThemeSection>
                   {section.title ? (
                     <Typography variant="h2" sx={{ mb: 3 }}>
                       {section.title}
