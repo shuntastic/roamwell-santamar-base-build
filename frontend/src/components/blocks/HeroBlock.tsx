@@ -67,15 +67,14 @@ export function HeroBlock({ block, locale }: Props) {
             sx={{
               position: 'absolute',
               inset: 0,
-              // background: `linear-gradient(180deg, #fbcc3400 50%, #fbcc3424 80%, #fbcc345e 100%)`,
-              background: `linear-gradient(180deg, ${theme.palette.primary.dark}40 75%, ${theme.palette.primary.dark}b8 90%, ${theme.palette.primary.dark}e0 100%)`,
+              background: `linear-gradient(41deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.dark}b8 18%, ${theme.palette.primary.dark}00 55%)`,
             }}
           />
         ) : null}
       </Box>
       <Container
         maxWidth={theme.layout.contentMaxWidth}
-        sx={{ position: 'relative', pb: { xs: 8, md: 12 }, pt: 16 }}
+        sx={{ position: 'relative', pb: { xs: 8, md: 8 }, pt: 16 }}
       >
         <HeroMotion>
           {block.eyebrow ? (
