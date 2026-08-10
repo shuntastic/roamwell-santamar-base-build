@@ -11,12 +11,17 @@ import { getStrapiMediaUrl } from '@/lib/strapi';
 
 type Props = {
   slideshow: StrapiSlideshow;
+  /** Crossfade duration in milliseconds. Defaults to 1000 (1 second). */
+  transitionMs?: number;
 };
 
-export function Slideshow({ slideshow }: Props) {
+export function Slideshow({ slideshow, transitionMs = 1000 }: Props) {
   const slides = slideshow.slides ?? [];
   const [index, setIndex] = React.useState(0);
-  const active = slides[index];
+  const safeIndex = slides.length ? index % slides.length : 0;
+  const active = slides[safeIndex];
+  const isCarousel = slides.length > 1;
+  const fadeMs = Math.max(0, transitionMs);
 
   React.useEffect(() => {
     if (!slideshow.autoplay || slides.length < 2) return undefined;
@@ -24,12 +29,12 @@ export function Slideshow({ slideshow }: Props) {
       setIndex((current) => (current + 1) % slides.length);
     }, slideshow.intervalMs ?? 5000);
     return () => window.clearInterval(timer);
-  }, [slideshow.autoplay, slideshow.intervalMs, slides.length]);
+  }, [slideshow.autoplay, slideshow.intervalMs, slides.length, safeIndex]);
 
-  if (!active?.media) return null;
+  if (!slides.length || !active?.media) return null;
 
-  const mediaUrl = getStrapiMediaUrl(active.media.url);
-  const isVideo = active.media.mime?.startsWith('video/');
+  const goPrev = () => setIndex((current) => (current - 1 + slides.length) % slides.length);
+  const goNext = () => setIndex((current) => (current + 1) % slides.length);
 
   return (
     <Box
@@ -40,8 +45,11 @@ export function Slideshow({ slideshow }: Props) {
         position: 'relative',
         overflow: 'hidden',
         bgcolor: 'primary.dark',
-        color: 'primary.contrastText',
-        minHeight: { xs: 280, md: 480 },
+        color: 'common.white',
+        width: '100%',
+        maxWidth: 1200,
+        height: 840,
+        mx: 'auto',
       }}
     >
       {slideshow.title ? (
@@ -54,32 +62,52 @@ export function Slideshow({ slideshow }: Props) {
       ) : null}
 
       <Box sx={{ position: 'absolute', inset: 0 }}>
-        {isVideo ? (
-          <Box
-            component="video"
-            key={mediaUrl}
-            src={mediaUrl ?? undefined}
-            autoPlay
-            muted
-            loop
-            playsInline
-            sx={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          <Box
-            component="img"
-            key={mediaUrl}
-            src={mediaUrl ?? undefined}
-            alt={active.altText || active.caption || slideshow.title || ''}
-            sx={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        )}
+        {slides.map((slide, slideIndex) => {
+          if (!slide.media) return null;
+          const mediaUrl = getStrapiMediaUrl(slide.media.url);
+          if (!mediaUrl) return null;
+          const isVideo = slide.media.mime?.startsWith('video/');
+          const activeSlide = slideIndex === safeIndex;
+
+          return (
+            <Box
+              key={`${slide.id ?? mediaUrl}-${slideIndex}`}
+              aria-hidden={!activeSlide}
+              sx={{
+                position: 'absolute',
+                inset: 0,
+                opacity: activeSlide ? 1 : 0,
+                transition: isCarousel ? `opacity ${fadeMs}ms ease` : 'none',
+                pointerEvents: activeSlide ? 'auto' : 'none',
+              }}
+            >
+              {isVideo ? (
+                <Box
+                  component="video"
+                  src={mediaUrl}
+                  autoPlay={activeSlide}
+                  muted
+                  loop
+                  playsInline
+                  sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                />
+              ) : (
+                <Box
+                  component="img"
+                  src={mediaUrl}
+                  alt={slide.altText || slide.caption || slideshow.title || ''}
+                  sx={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                />
+              )}
+            </Box>
+          );
+        })}
         <Box
           sx={{
             position: 'absolute',
             inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(7,58,80,0.15) 0%, rgba(7,58,80,0.55) 100%)',
+            zIndex: 1,
+            pointerEvents: 'none',
           }}
         />
       </Box>
@@ -89,36 +117,56 @@ export function Slideshow({ slideshow }: Props) {
           variant="body1"
           sx={{
             position: 'absolute',
-            left: { xs: 20, md: 40 },
-            right: { xs: 20, md: 120 },
+            left: { xs: 56, md: 72 },
+            right: { xs: 56, md: 72 },
             bottom: { xs: 24, md: 36 },
             zIndex: 2,
             maxWidth: 640,
             fontFamily: 'var(--font-display), "Times New Roman", serif',
             fontSize: { xs: '1.15rem', md: '1.5rem' },
+            opacity: 1,
+            transition: isCarousel ? `opacity ${fadeMs}ms ease` : 'none',
           }}
         >
           {active.caption}
         </Typography>
       ) : null}
 
-      {slides.length > 1 ? (
-        <Box sx={{ position: 'absolute', right: 12, bottom: 12, zIndex: 2, display: 'flex', gap: 0.5 }}>
+      {isCarousel ? (
+        <>
           <IconButton
             aria-label="Previous slide"
-            onClick={() => setIndex((current) => (current - 1 + slides.length) % slides.length)}
-            sx={{ color: 'inherit', bgcolor: 'rgba(255,255,255,0.12)' }}
+            onClick={goPrev}
+            sx={{
+              position: 'absolute',
+              left: 8,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 2,
+              color: 'inherit',
+              bgcolor: 'rgba(255,255,255,0.12)',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.22)' },
+            }}
           >
             <ChevronLeftIcon />
           </IconButton>
           <IconButton
             aria-label="Next slide"
-            onClick={() => setIndex((current) => (current + 1) % slides.length)}
-            sx={{ color: 'inherit', bgcolor: 'rgba(255,255,255,0.12)' }}
+            onClick={goNext}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              zIndex: 2,
+              color: 'inherit',
+              bgcolor: 'rgba(255,255,255,0.12)',
+              '&:hover': { bgcolor: 'rgba(255,255,255,0.22)' },
+            }}
           >
             <ChevronRightIcon />
           </IconButton>
-        </Box>
+        </>
       ) : null}
     </Box>
   );

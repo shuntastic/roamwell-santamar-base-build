@@ -36,6 +36,7 @@ const meta = {
   component: Slideshow,
   args: {
     slideshow: sample,
+    transitionMs: 1000,
   },
 } satisfies Meta<typeof Slideshow>;
 
@@ -43,6 +44,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const FastCrossfade: Story = {
+  args: {
+    transitionMs: 400,
+  },
+};
 
 export const SingleSlide: Story = {
   args: {

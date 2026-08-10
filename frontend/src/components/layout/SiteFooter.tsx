@@ -17,7 +17,7 @@ export function SiteFooter({ global }: Props) {
     <Box
       component="footer"
       sx={{
-        mt: 'auto',
+        mt: '60px',
         py: theme.layout.sectionPaddingY,
         borderTop: '1px solid',
         borderColor: 'divider',

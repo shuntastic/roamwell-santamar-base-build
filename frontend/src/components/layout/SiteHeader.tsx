@@ -169,7 +169,7 @@ export function SiteHeader({ locale, siteName, items }: Props) {
             boxShadow: 'none',
           }
         : {
-            bgcolor: 'rgba(247, 251, 252, 0.86)',
+            bgcolor: 'rgba(247, 251, 252, 0.3)',
             color: 'text.primary',
             backdropFilter: 'blur(12px)',
             borderBottom: '1px solid',
