@@ -587,6 +587,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
       [
         'blocks.hero',
         'blocks.rich-text',
+        'blocks.statement',
         'blocks.image-text',
         'blocks.feature-grid',
         'blocks.media-gallery',
@@ -609,20 +610,8 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
           localized: true;
         };
       }>;
-    slideshows: Schema.Attribute.Component<'media.slideshow', true> &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
     slug: Schema.Attribute.UID<'title'> &
       Schema.Attribute.Required &
-      Schema.Attribute.SetPluginOptions<{
-        i18n: {
-          localized: true;
-        };
-      }>;
-    styledCopy: Schema.Attribute.Blocks &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: true;

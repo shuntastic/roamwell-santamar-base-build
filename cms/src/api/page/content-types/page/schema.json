@@ -18,22 +18,22 @@
   "attributes": {
     "title": {
       "type": "string",
-      "required": true,
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "required": true
     },
     "slug": {
       "type": "uid",
-      "targetField": "title",
-      "required": true,
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "targetField": "title",
+      "required": true
     },
     "navLabel": {
       "type": "string",
@@ -43,29 +43,17 @@
         }
       }
     },
-    "styledCopy": {
-      "type": "blocks",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
-    "slideshows": {
-      "type": "component",
-      "repeatable": true,
-      "component": "media.slideshow",
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
-    },
     "sections": {
       "type": "dynamiczone",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      },
       "components": [
         "blocks.hero",
         "blocks.rich-text",
+        "blocks.statement",
         "blocks.image-text",
         "blocks.feature-grid",
         "blocks.media-gallery",
@@ -75,22 +63,17 @@
         "blocks.contact-form",
         "blocks.modal-button",
         "blocks.video-embed"
-      ],
-      "pluginOptions": {
-        "i18n": {
-          "localized": true
-        }
-      }
+      ]
     },
     "seo": {
       "type": "component",
-      "repeatable": false,
-      "component": "shared.seo",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
-      }
+      },
+      "component": "shared.seo",
+      "repeatable": false
     }
   }
 }

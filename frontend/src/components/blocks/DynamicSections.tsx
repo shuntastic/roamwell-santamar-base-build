@@ -15,6 +15,7 @@ import { ImageTextBlock } from '@/components/blocks/ImageTextBlock';
 import { ContactFormBlock } from '@/components/blocks/ContactFormBlock';
 import { ModalButtonBlock } from '@/components/blocks/ModalButtonBlock';
 import { BookingCalendarBlock } from '@/components/blocks/BookingCalendarBlock';
+import { StatementBlock } from '@/components/blocks/StatementBlock';
 import { SectionReveal } from '@/components/blocks/SectionReveal';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { ThemeSection } from '@/components/layout/ThemeSection';
@@ -47,6 +48,13 @@ export function DynamicSections({ sections, locale }: Props) {
                   ) : null}
                   <StyledCopy content={section.body} />
                 </ThemeSection>
+              </SectionReveal>
+            );
+
+          case 'blocks.statement':
+            return (
+              <SectionReveal key={`${section.__component}-${section.id}`}>
+                <StatementBlock block={section} />
               </SectionReveal>
             );
 

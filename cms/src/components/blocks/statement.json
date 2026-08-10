@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blocks_statements",
+  "info": {
+    "displayName": "Statement",
+    "description": "Centered statement text used as a section divider",
+    "icon": "quote"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "body": {
+      "type": "text"
+    }
+  }
+}
