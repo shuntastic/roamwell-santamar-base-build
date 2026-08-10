@@ -12,45 +12,50 @@ type ThemeDefinition = {
   backgroundImage: string;
   buttonContainedHoverShadow: string;
   buttonRadius: number | string;
+  /** Per-theme typography overrides merged onto `sharedTypography`. */
+  typography?: ThemeOptions['typography'];
 };
 
 function buildTheme(definition: ThemeDefinition): Theme {
-  return createTheme({
-    cssVariables: true,
-    palette: definition.palette,
-    typography: sharedTypography,
-    shape: definition.shape,
-    layout: definition.layout,
-    components: {
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            borderRadius: definition.buttonRadius,
-            paddingInline: '1.35rem',
-            paddingBlock: '0.65rem',
+  return createTheme(
+    {
+      cssVariables: true,
+      palette: definition.palette,
+      typography: sharedTypography,
+      shape: definition.shape,
+      layout: definition.layout,
+      components: {
+        MuiButton: {
+          styleOverrides: {
+            root: {
+              borderRadius: definition.buttonRadius,
+              paddingInline: '1.35rem',
+              paddingBlock: '0.65rem',
+            },
+            contained: {
+              boxShadow: 'none',
+              '&:hover': {
+                boxShadow: definition.buttonContainedHoverShadow,
+              },
+            },
           },
-          contained: {
-            boxShadow: 'none',
-            '&:hover': {
-              boxShadow: definition.buttonContainedHoverShadow,
+        },
+        MuiCssBaseline: {
+          styleOverrides: {
+            body: {
+              backgroundImage: definition.backgroundImage,
+              backgroundAttachment: 'fixed',
+              minHeight: '100vh',
+            },
+            a: {
+              color: 'inherit',
             },
           },
         },
       },
-      MuiCssBaseline: {
-        styleOverrides: {
-          body: {
-            backgroundImage: definition.backgroundImage,
-            backgroundAttachment: 'fixed',
-            minHeight: '100vh',
-          },
-          a: {
-            color: 'inherit',
-          },
-        },
-      },
     },
-  });
+    definition.typography ? { typography: definition.typography } : {},
+  );
 }
 
 /** Default — coastal hospitality: Atlantic teal + coral. */
@@ -91,6 +96,11 @@ const coastal = buildTheme({
       secondary: '#3D5A66',
     },
     divider: 'rgba(11, 79, 108, 0.14)',
+  },
+  typography: {
+    h3: {
+      color: '#c45c26',
+    },
   },
   shape: { borderRadius: 4 },
   buttonRadius: 999,
