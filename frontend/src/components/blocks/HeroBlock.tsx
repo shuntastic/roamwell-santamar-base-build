@@ -85,7 +85,7 @@ export function HeroBlock({ block, locale }: Props) {
           <Typography
             variant="h1"
             className="hero-headline"
-            sx={{ fontSize: { xs: '3.2rem', md: '5.5rem' }, lineHeight: '1.05', maxWidth: 900, mt: 1 }}
+            sx={{ fontSize: { xs: '3.2rem', md: '5.5rem' }, lineHeight: '1.05', maxWidth: 700, mt: 1 }}
           >
             {block.headline}
           </Typography>
