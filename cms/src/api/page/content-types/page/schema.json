@@ -5,7 +5,7 @@
     "singularName": "page",
     "pluralName": "pages",
     "displayName": "Page",
-    "description": "CMS-managed site page with title, styled copy, slideshows, and custom components"
+    "description": "CMS-managed site page with dynamic sections and SEO"
   },
   "options": {
     "draftAndPublish": true

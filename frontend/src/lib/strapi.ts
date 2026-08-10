@@ -20,15 +20,10 @@ type StrapiSingleResponse<T> = {
 /**
  * Deep populate for Page documents.
  * Uses indexed array populate params Strapi 5 expects.
+ * Keep keys aligned with `cms/src/api/page/content-types/page/schema.json` —
+ * unknown populate keys make Strapi 5 return 400.
  */
 const PAGE_POPULATE: Record<string, unknown> = {
-  slideshows: {
-    populate: {
-      slides: {
-        populate: ['media'],
-      },
-    },
-  },
   seo: {
     populate: ['ogImage'],
   },
@@ -115,10 +110,22 @@ async function strapiFetch<T>(path: string, query?: Record<string, unknown>): Pr
   });
 
   if (!response.ok) {
-    throw new Error(`Strapi request failed (${response.status}): ${url}`);
+    let detail = '';
+    try {
+      const body = (await response.json()) as { error?: { message?: string } };
+      detail = body.error?.message ? ` — ${body.error.message}` : '';
+    } catch {
+      // ignore body parse failures
+    }
+    throw new Error(`Strapi request failed (${response.status}): ${url}${detail}`);
   }
 
   return response.json() as Promise<T>;
+}
+
+function logStrapiFailure(scope: string, error: unknown) {
+  if (process.env.NODE_ENV === 'production') return;
+  console.error(`[strapi] ${scope}`, error);
 }
 
 export function getStrapiMediaUrl(url?: string | null): string | null {
@@ -143,7 +150,8 @@ export async function getPageBySlug(slug: string, locale: Locale): Promise<CmsPa
     });
 
     return result.data?.[0] ?? null;
-  } catch {
+  } catch (error) {
+    logStrapiFailure(`getPageBySlug(${normalized}, ${locale})`, error);
     return null;
   }
 }
@@ -158,7 +166,8 @@ export async function getAllPages(locale: Locale): Promise<CmsPage[]> {
       },
     });
     return result.data ?? [];
-  } catch {
+  } catch (error) {
+    logStrapiFailure(`getAllPages(${locale})`, error);
     return [];
   }
 }
@@ -175,7 +184,8 @@ export async function getNavigation(locale: Locale): Promise<Navigation | null> 
       },
     });
     return result.data;
-  } catch {
+  } catch (error) {
+    logStrapiFailure(`getNavigation(${locale})`, error);
     return null;
   }
 }
@@ -193,7 +203,8 @@ export async function getGlobal(locale: Locale): Promise<GlobalSettings | null> 
       },
     });
     return result.data;
-  } catch {
+  } catch (error) {
+    logStrapiFailure(`getGlobal(${locale})`, error);
     return null;
   }
 }
