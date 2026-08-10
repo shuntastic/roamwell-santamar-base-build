@@ -1,61 +1,35 @@
-# 🚀 Getting started with Strapi
+# Santamar CMS (Strapi 5)
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
+Content API and admin for the Santamar hospitality site.
 
-### `develop`
+## Local development
 
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
-
-```
+```bash
+cp .env.example .env
+npm install
 npm run develop
-# or
-yarn develop
 ```
 
-### `start`
+Admin: http://localhost:1337/admin
 
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
+Default database is **SQLite** (`.tmp/data.db`). Set `SEED_CONTENT=false` to skip bootstrap seed content.
 
-```
-npm run start
-# or
-yarn start
-```
+## Production (LAMP)
 
-### `build`
+Use **MySQL** + Apache reverse-proxy + PM2. Full instructions:
 
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
+→ **[../docs/DEPLOY-LAMP.md](../docs/DEPLOY-LAMP.md)**
 
-```
-npm run build
-# or
-yarn build
-```
+Key production env vars: `DATABASE_CLIENT=mysql`, `PUBLIC_URL`, `FRONTEND_URL`, `PROXY_KOA=true`.
 
-## ⚙️ Deployment
+## Scripts
 
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
+| Command | Description |
+| --- | --- |
+| `npm run develop` | Dev server with reload |
+| `npm run build` | Build admin panel |
+| `npm run start` | Production server |
 
-```
-yarn strapi deploy
-```
+## Deploy helpers
 
-## 📚 Learn more
-
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
-
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
-
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
-
----
-
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+Canonical copies live in [`../deploy/`](../deploy/). Legacy paths under `deploy/` in this folder still work for MySQL SQL and Apache CMS vhost.

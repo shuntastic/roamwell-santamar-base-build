@@ -19,20 +19,23 @@ Monorepo for a custom CMS-driven hospitality site.
 
 Each page supports:
 
-1. **Title**
-2. **Styled copy** (Strapi Blocks)
-3. **Slideshows** (images or videos + captions)
-4. **Custom components** via a Dynamic Zone (`sections`)
+1. **Title** + SEO
+2. **Dynamic Zone `sections`** (hero, statement, image-text, contact form, etc.)
+3. Optional media via section components (e.g. media-gallery)
 
 ### Available Dynamic Zone components
 
 - `blocks.hero`
 - `blocks.rich-text`
+- `blocks.statement`
+- `blocks.image-text`
 - `blocks.feature-grid`
 - `blocks.media-gallery`
 - `blocks.location-map`
 - `blocks.booking-cta`
+- `blocks.booking-calendar`
 - `blocks.contact-form`
+- `blocks.modal-button`
 - `blocks.video-embed`
 
 ## Quick start
@@ -99,16 +102,22 @@ npm run storybook
 
 Club GreenSock package is committed as root `gsap-bonus.tgz` and installed into the frontend as the `gsap` dependency (includes `SplitText`, `ScrollSmoother`, etc.). Helpers live in `frontend/src/lib/gsap.ts`.
 
-## LAMP deployment (CMS)
+## LAMP deployment
 
-Strapi is a Node app. On a LAMP host:
+Santamar on LAMP = **Apache reverse-proxy + MySQL + Node/PM2** (not PHP DocumentRoot).
 
-1. Create MySQL DB/user — see `cms/deploy/mysql-setup.sql`
-2. Set `DATABASE_CLIENT=mysql` and credentials in `cms/.env`
-3. Build: `npm run build && npm run start` (or PM2 via `cms/deploy/ecosystem.config.js`)
-4. Reverse-proxy with Apache — `cms/deploy/apache-strapi.conf`
+Full guide: **[docs/DEPLOY-LAMP.md](docs/DEPLOY-LAMP.md)**
 
-Apache still serves as the public HTTP layer; Node/PM2 runs Strapi behind it; MySQL is the data store.
+Quick path:
+
+1. MySQL — `deploy/mysql-setup.sql`
+2. CMS `.env` — `DATABASE_CLIENT=mysql`, `PUBLIC_URL`, `FRONTEND_URL`, secrets
+3. `cd cms && npm ci && npm run build` then PM2
+4. Frontend — set `NEXT_PUBLIC_STRAPI_URL` to the **public** CMS URL, then `npm ci && npm run build`
+5. `pm2 start deploy/ecosystem.config.js`
+6. Apache — `deploy/apache-web.conf` + `deploy/apache-cms.conf` (+ certbot)
+
+Config artifacts live under [`deploy/`](deploy/).
 
 ## Content model notes
 
@@ -116,7 +125,7 @@ Apache still serves as the public HTTP layer; Node/PM2 runs Strapi behind it; My
 - **Navigation** — localized single type of nav items
 - **Global** — brand, contact, default SEO
 
-Front-end fetches published content with deep `populate` for slideshows and dynamic sections (`frontend/src/lib/strapi.ts`). If the CMS is offline, fallback nav/pages keep the framework browsable.
+Front-end fetches published content with deep `populate` for dynamic sections (`frontend/src/lib/strapi.ts`). Populate keys must match the page schema — unknown keys make Strapi 5 return 400. If the CMS is offline, fallback nav/pages keep the framework browsable.
 
 ## Designer / developer workflow
 

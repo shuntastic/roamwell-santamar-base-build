@@ -10,6 +10,8 @@
     "dev:web": "npm run dev --prefix frontend",
     "build:cms": "npm run build --prefix cms",
     "build:web": "npm run build --prefix frontend",
+    "start:cms": "npm run start --prefix cms",
+    "start:web": "npm run start --prefix frontend",
     "storybook": "npm run storybook --prefix frontend"
   }
 }

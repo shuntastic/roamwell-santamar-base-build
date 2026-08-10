@@ -1,4 +1,5 @@
 -- Create MySQL database + user for Strapi on a LAMP host.
+-- Prefer `/deploy/mysql-setup.sql` at the repo root (same contents).
 -- Run as MySQL root, then update cms/.env with matching credentials.
 
 CREATE DATABASE IF NOT EXISTS santamar_cms
