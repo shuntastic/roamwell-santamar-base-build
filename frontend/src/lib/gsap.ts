@@ -44,7 +44,7 @@ export function revealOnScroll(selector: string, trigger?: Element | string) {
         scrollTrigger: {
           trigger: trigger ?? element,
           start: "top 85%",
-          toggleActions: "play none none reverse",
+          once: true,
         },
         y: 0,
         opacity: 1,
