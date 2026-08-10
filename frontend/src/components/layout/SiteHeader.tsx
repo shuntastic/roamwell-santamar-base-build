@@ -5,16 +5,27 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
+import Divider from '@mui/material/Divider';
+import Drawer from '@mui/material/Drawer';
+import IconButton from '@mui/material/IconButton';
+import List from '@mui/material/List';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import CloseIcon from '@mui/icons-material/Close';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import MenuIcon from '@mui/icons-material/Menu';
 import { useTheme } from '@mui/material/styles';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { NavItem } from '@/types/cms';
 import { localeLabels, localeNames, locales, type Locale } from '@/lib/i18n';
+
+/** MUI `md` — 900px. Nav collapses to a hamburger below this width. */
+const NAV_BREAKPOINT = 'md' as const;
 
 type Props = {
   locale: Locale;
@@ -28,21 +39,29 @@ function localizeHref(locale: Locale, url: string) {
   return `/${locale}${path}`;
 }
 
-function LocaleSelect({ locale }: { locale: Locale }) {
+function LocaleSelect({
+  locale,
+  idPrefix = 'locale-select',
+}: {
+  locale: Locale;
+  idPrefix?: string;
+}) {
   const pathname = usePathname();
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
   const rest = pathname.replace(/^\/(en|es|pt)/, '') || '';
+  const buttonId = `${idPrefix}-button`;
+  const menuId = `${idPrefix}-menu`;
 
   const close = () => setAnchorEl(null);
 
   return (
-    <Box sx={{ flexShrink: 0, ml: { xs: 'auto', md: 0 } }}>
+    <Box sx={{ flexShrink: 0 }}>
       <Button
-        id="locale-select-button"
+        id={buttonId}
         size="small"
         color="inherit"
-        aria-controls={open ? 'locale-select-menu' : undefined}
+        aria-controls={open ? menuId : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
         aria-label={`Language: ${localeNames[locale]}`}
@@ -76,7 +95,7 @@ function LocaleSelect({ locale }: { locale: Locale }) {
       </Button>
 
       <Menu
-        id="locale-select-menu"
+        id={menuId}
         anchorEl={anchorEl}
         open={open}
         onClose={close}
@@ -84,7 +103,7 @@ function LocaleSelect({ locale }: { locale: Locale }) {
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{
           list: {
-            'aria-labelledby': 'locale-select-button',
+            'aria-labelledby': buttonId,
             dense: true,
             sx: { py: 0.5, minWidth: 148 },
           },
@@ -152,6 +171,11 @@ export function SiteHeader({ locale, siteName, items }: Props) {
   const pathname = usePathname();
   const sorted = [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
   const { headerStyle, headerHeight, contentMaxWidth, navGap } = theme.layout;
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   const headerSx =
     headerStyle === 'solid'
@@ -176,6 +200,8 @@ export function SiteHeader({ locale, siteName, items }: Props) {
             borderColor: 'divider',
           };
 
+  const closeMobile = () => setMobileOpen(false);
+
   return (
     <AppBar position="sticky" elevation={0} sx={headerSx}>
       <Container maxWidth={contentMaxWidth}>
@@ -195,8 +221,9 @@ export function SiteHeader({ locale, siteName, items }: Props) {
 
           <Box
             component="nav"
+            aria-label="Primary"
             sx={{
-              display: { xs: 'none', md: 'flex' },
+              display: { xs: 'none', [NAV_BREAKPOINT]: 'flex' },
               alignItems: 'center',
               gap: navGap,
               flexWrap: 'wrap',
@@ -233,9 +260,122 @@ export function SiteHeader({ locale, siteName, items }: Props) {
             })}
           </Box>
 
-          <LocaleSelect locale={locale} />
+          <Box
+            sx={{
+              display: { xs: 'none', [NAV_BREAKPOINT]: 'block' },
+              flexShrink: 0,
+            }}
+          >
+            <LocaleSelect locale={locale} idPrefix="locale-header" />
+          </Box>
+
+          <IconButton
+            color="inherit"
+            aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
+            aria-controls="mobile-navigation"
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen((current) => !current)}
+            sx={{
+              display: { xs: 'inline-flex', [NAV_BREAKPOINT]: 'none' },
+              ml: 'auto',
+            }}
+          >
+            {mobileOpen ? <CloseIcon /> : <MenuIcon />}
+          </IconButton>
         </Toolbar>
       </Container>
+
+      <Drawer
+        anchor="right"
+        open={mobileOpen}
+        onClose={closeMobile}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: 'block', [NAV_BREAKPOINT]: 'none' },
+          '& .MuiDrawer-paper': {
+            width: 'min(100vw - 48px, 320px)',
+            bgcolor: 'background.paper',
+            backgroundImage: 'none',
+            color: 'text.primary',
+            px: 1,
+            pt: 1,
+            pb: 3,
+          },
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            px: 1,
+            minHeight: headerHeight,
+          }}
+        >
+          <Typography
+            variant="subtitle2"
+            sx={{ fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}
+          >
+            Menu
+          </Typography>
+          <IconButton aria-label="Close navigation" onClick={closeMobile} edge="end">
+            <CloseIcon />
+          </IconButton>
+        </Box>
+
+        <Divider />
+
+        <Box
+          component="nav"
+          id="mobile-navigation"
+          aria-label="Primary"
+          sx={{ pt: 1 }}
+        >
+          <List disablePadding>
+            {sorted.map((item) => {
+              const href = localizeHref(locale, item.url);
+              const active =
+                pathname === href || (item.url !== '/' && pathname.startsWith(href));
+              return (
+                <ListItemButton
+                  key={`${item.label}-${item.url}`}
+                  component={Link}
+                  href={href}
+                  selected={active}
+                  onClick={closeMobile}
+                  sx={{
+                    borderRadius: 1,
+                    mx: 0.5,
+                    '&.Mui-selected': {
+                      color: 'secondary.main',
+                    },
+                  }}
+                >
+                  <ListItemText
+                    primary={item.label}
+                    primaryTypographyProps={{
+                      fontWeight: active ? 600 : 400,
+                    }}
+                  />
+                </ListItemButton>
+              );
+            })}
+          </List>
+        </Box>
+
+        <Divider sx={{ my: 2 }} />
+
+        <Box sx={{ px: 1.5 }}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: 'block', mb: 1, letterSpacing: '0.08em', textTransform: 'uppercase' }}
+          >
+            Language
+          </Typography>
+          <LocaleSelect locale={locale} idPrefix="locale-drawer" />
+        </Box>
+      </Drawer>
     </AppBar>
   );
 }
