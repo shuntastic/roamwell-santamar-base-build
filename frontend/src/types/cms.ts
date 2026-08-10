@@ -142,6 +142,7 @@ export type BlocksContactForm = {
   id: number;
   title?: string | null;
   intro?: string | null;
+  image?: StrapiMedia | null;
   submitLabel?: string | null;
   successMessage?: string | null;
   recipientEmail?: string | null;

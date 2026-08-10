@@ -2,7 +2,7 @@
   "collectionName": "components_blocks_contact_forms",
   "info": {
     "displayName": "Contact Form",
-    "description": "Contact form configuration (EN/ES/PT copy via page locale)",
+    "description": "Split contact section with image on the left and form on the right (EN/ES/PT copy via page locale)",
     "icon": "envelope"
   },
   "options": {},
@@ -12,6 +12,11 @@
     },
     "intro": {
       "type": "text"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"]
     },
     "submitLabel": {
       "type": "string",
