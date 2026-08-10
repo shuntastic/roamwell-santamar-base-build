@@ -45,6 +45,7 @@ export type BlocksHero = {
   subheadline?: string | null;
   description?: unknown;
   backgroundMedia?: StrapiMedia | null;
+  showGradient?: boolean | null;
   cta?: StrapiLink | null;
 };
 

@@ -25,6 +25,10 @@
       "multiple": false,
       "allowedTypes": ["images", "videos"]
     },
+    "showGradient": {
+      "type": "boolean",
+      "default": true
+    },
     "cta": {
       "type": "component",
       "repeatable": false,

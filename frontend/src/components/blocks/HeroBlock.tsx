@@ -62,29 +62,30 @@ export function HeroBlock({ block, locale }: Props) {
         ) : (
           <Box sx={{ width: '100%', height: '100%', background: fallbackGradient }} />
         )}
-        <Box
-          sx={{
-            position: 'absolute',
-            inset: 0,
-            background: `linear-gradient(180deg, ${theme.palette.primary.dark}40 0%, ${theme.palette.primary.dark}b8 70%, ${theme.palette.primary.dark}e0 100%)`,
-          }}
-        />
+        {block.showGradient !== false ? (
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              background: `linear-gradient(180deg, ${theme.palette.primary.dark}40 75%, ${theme.palette.primary.dark}b8 90%, ${theme.palette.primary.dark}e0 100%)`,
+            }}
+          />
+        ) : null}
       </Box>
-
       <Container
         maxWidth={theme.layout.contentMaxWidth}
         sx={{ position: 'relative', pb: { xs: 8, md: 12 }, pt: 16 }}
       >
         <HeroMotion>
           {block.eyebrow ? (
-            <Typography variant="overline" sx={{ letterSpacing: '0.18em', opacity: 0.9 }}>
+            <Typography variant="overline" sx={{ letterSpacing: '0.18em', opacity: 1.0, fontSize: '1.0rem', textShadow: '0 0 6px rgba(0, 0, 0, 0.5)' }}>
               {block.eyebrow}
             </Typography>
           ) : null}
           <Typography
             variant="h1"
             className="hero-headline"
-            sx={{ fontSize: { xs: '3.2rem', md: '5.5rem' }, maxWidth: 900, mt: 1 }}
+            sx={{ fontSize: { xs: '3.2rem', md: '5.5rem' }, lineHeight: '1.05', maxWidth: 900, mt: 1 }}
           >
             {block.headline}
           </Typography>

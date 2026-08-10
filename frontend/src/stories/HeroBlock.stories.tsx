@@ -28,6 +28,7 @@ const meta = {
         url: '/book-your-stay',
         variant: 'primary' as const,
       },
+      showGradient: true,
     },
   },
 } satisfies Meta<typeof HeroBlock>;
@@ -36,3 +37,26 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
+
+export const WithoutGradient: Story = {
+  args: {
+    block: {
+      __component: 'blocks.hero' as const,
+      id: 2,
+      eyebrow: 'Santamar',
+      headline: 'Coastal calm, curated stays',
+      subheadline: 'A hospitality framework powered by Strapi and Next.js.',
+      showGradient: false,
+      backgroundMedia: {
+        id: 1,
+        url: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600',
+        mime: 'image/jpeg',
+      },
+      cta: {
+        label: 'Book Your Stay',
+        url: '/book-your-stay',
+        variant: 'primary' as const,
+      },
+    },
+  },
+};
