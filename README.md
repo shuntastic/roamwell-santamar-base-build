@@ -102,13 +102,26 @@ npm run storybook
 
 Club GreenSock package is committed as root `gsap-bonus.tgz` and installed into the frontend as the `gsap` dependency (includes `SplitText`, `ScrollSmoother`, etc.). Helpers live in `frontend/src/lib/gsap.ts`.
 
-## LAMP deployment
+## Deployment
 
-Santamar on LAMP = **Apache reverse-proxy + MySQL + Node/PM2** (not PHP DocumentRoot).
+| Target | Guide |
+| --- | --- |
+| **AWS Free Tier (EC2)** | **[docs/DEPLOY-AWS.md](docs/DEPLOY-AWS.md)** — `./deploy/aws/deploy.sh` |
+| **LAMP VPS** | **[docs/DEPLOY-LAMP.md](docs/DEPLOY-LAMP.md)** — Apache + MySQL + PM2 |
 
-Full guide: **[docs/DEPLOY-LAMP.md](docs/DEPLOY-LAMP.md)**
+Both run **Nginx/Apache reverse-proxy + Node (Strapi + Next)**. Neither is a PHP DocumentRoot app.
 
-Quick path:
+### AWS Free Tier (quick start)
+
+```bash
+# Prerequisites: AWS CLI v2, jq, rsync, SSH; `aws configure` completed
+cp deploy/aws/aws.env.example deploy/aws/aws.env
+# edit deploy/aws/aws.env (region, SSH_CIDR, etc.)
+chmod +x deploy/aws/deploy.sh deploy/aws/bootstrap-remote.sh
+./deploy/aws/deploy.sh
+```
+
+### LAMP (quick path)
 
 1. MySQL — `deploy/mysql-setup.sql`
 2. CMS `.env` — `DATABASE_CLIENT=mysql`, `PUBLIC_URL`, `FRONTEND_URL`, secrets
@@ -117,7 +130,7 @@ Quick path:
 5. `pm2 start deploy/ecosystem.config.js`
 6. Apache — `deploy/apache-web.conf` + `deploy/apache-cms.conf` (+ certbot)
 
-Config artifacts live under [`deploy/`](deploy/).
+LAMP config artifacts: [`deploy/`](deploy/). AWS scripts: [`deploy/aws/`](deploy/aws/).
 
 ## Content model notes
 
