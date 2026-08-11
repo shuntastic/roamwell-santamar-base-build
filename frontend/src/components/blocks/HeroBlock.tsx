@@ -67,7 +67,9 @@ export function HeroBlock({ block, locale }: Props) {
             sx={{
               position: 'absolute',
               inset: 0,
-              background: `linear-gradient(41deg, ${theme.palette.primary.dark} 0%, ${theme.palette.primary.dark}b8 18%, ${theme.palette.primary.dark}00 55%)`,
+              background: `linear-gradient(41deg, #00000030 0%, #00000075 32%, #00000000 77%)`,
+              // background: `linear-gradient(41deg, ${theme.palette.primary.dark}dd 0%, ${theme.palette.primary.dark}b8 34%, ${theme.palette.primary.dark}00 86%)`,
+              // linear-gradient(41deg, #073A50dd 0%, #073A50b8 34%, #073A5000 86%)
             }}
           />
         ) : null}
@@ -85,7 +87,7 @@ export function HeroBlock({ block, locale }: Props) {
           <Typography
             variant="h1"
             className="hero-headline"
-            sx={{ fontSize: { xs: '3.2rem', md: '5.5rem' }, lineHeight: '1.05', maxWidth: 700, mt: 1 }}
+            sx={{ fontSize: { xs: '3.2rem', md: '4.75rem' }, lineHeight: '1.05', maxWidth: 700, mt: 1 }}
           >
             {block.headline}
           </Typography>
@@ -93,7 +95,7 @@ export function HeroBlock({ block, locale }: Props) {
             <Typography
               className="hero-sub"
               variant="body1"
-              sx={{ mt: 2, maxWidth: 520, fontSize: { xs: '1.05rem', md: '1.2rem' }, opacity: 0.92 }}
+              sx={{ mt: 2, maxWidth: 520, fontSize: { xs: '1.2rem', md: '1.5rem' }, fontWeight: 600, opacity: 1.0, letterSpacing: '0.03em' }}
             >
               {block.subheadline}
             </Typography>
@@ -105,7 +107,7 @@ export function HeroBlock({ block, locale }: Props) {
                 mt: 2,
                 maxWidth: 560,
                 opacity: 0.9,
-                fontSize: { xs: '0.98rem', md: '1.05rem' },
+                fontSize: { xs: '0.98rem', md: '1.125rem' },
               }}
             >
               <StyledCopy content={block.description} color="inherit" />
