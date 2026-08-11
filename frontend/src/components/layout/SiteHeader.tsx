@@ -213,7 +213,8 @@ export function SiteHeader({ locale, siteName, items }: Props) {
             sx={{
               fontFamily: 'var(--font-display), "Times New Roman", serif',
               textDecoration: 'none',
-              color: headerStyle === 'solid' ? 'inherit' : 'primary.main',
+              fontSize: '2.025rem',
+              color: headerStyle === 'solid' ? 'inherit' : 'secondary.main',
             }}
           >
             {siteName}
@@ -353,8 +354,10 @@ export function SiteHeader({ locale, siteName, items }: Props) {
                 >
                   <ListItemText
                     primary={item.label}
-                    primaryTypographyProps={{
-                      fontWeight: active ? 600 : 400,
+                    slotProps={{
+                      primary: {
+                        fontWeight: active ? 600 : 400,
+                      },
                     }}
                   />
                 </ListItemButton>
