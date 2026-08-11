@@ -49,7 +49,8 @@ export function Slideshow({ slideshow, transitionMs = 1000 }: Props) {
         color: 'common.white',
         width: '100%',
         maxWidth: 1200,
-        height: 840,
+        height: '80vh',
+        maxHeight: 840,
         mx: 'auto',
       }}
     >
