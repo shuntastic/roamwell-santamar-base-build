@@ -117,6 +117,41 @@ fi
 
 mkdir -p cms/.tmp cms/public/uploads
 
+# --- Build memory headroom ---
+# Strapi admin (Vite) and Next builds routinely exceed Node's default ~1GiB heap.
+# On small EC2 sizes, also add swap so the kernel doesn't OOM-kill mid-build.
+MEM_MB="$(awk '/MemTotal/ {print int($2/1024)}' /proc/meminfo)"
+if [[ "$MEM_MB" -lt 1500 ]]; then
+  NODE_HEAP_MB=768
+  SWAP_MB=2048
+elif [[ "$MEM_MB" -lt 3600 ]]; then
+  NODE_HEAP_MB=1536
+  SWAP_MB=2048
+else
+  NODE_HEAP_MB=3072
+  SWAP_MB=0
+fi
+
+if [[ "$SWAP_MB" -gt 0 ]] && ! swapon --show | grep -q .; then
+  log "Creating ${SWAP_MB}MB swapfile for Node builds (${MEM_MB}MB RAM)"
+  sudo fallocate -l "${SWAP_MB}M" /swapfile 2>/dev/null \
+    || sudo dd if=/dev/zero of=/swapfile bs=1M count="$SWAP_MB" status=none
+  sudo chmod 600 /swapfile
+  sudo mkswap /swapfile >/dev/null
+  sudo swapon /swapfile
+  if ! grep -q '^/swapfile ' /etc/fstab 2>/dev/null; then
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab >/dev/null
+  fi
+fi
+
+# Preserve any pre-set NODE_OPTIONS, but ensure max-old-space-size is present.
+if [[ "${NODE_OPTIONS:-}" != *max-old-space-size* ]]; then
+  export NODE_OPTIONS="${NODE_OPTIONS:+${NODE_OPTIONS} }--max-old-space-size=${NODE_HEAP_MB}"
+fi
+# Keep Vite/esbuild from spawning too many parallel workers on 1–2 vCPU boxes.
+export UV_THREADPOOL_SIZE="${UV_THREADPOOL_SIZE:-2}"
+log "Build memory: RAM=${MEM_MB}MB heap=${NODE_HEAP_MB}MB NODE_OPTIONS=${NODE_OPTIONS}"
+
 # --- Frontend env (build-time) ---
 log "Writing frontend/.env.production"
 cat > frontend/.env.production <<EOF
@@ -126,7 +161,7 @@ HOSTNAME=127.0.0.1
 PORT=3000
 EOF
 
-log "Installing CMS dependencies and building (this can take several minutes on t3.micro)"
+log "Installing CMS dependencies and building (Strapi admin can take 5–15+ min on small instances)"
 cd "$APP_DIR/cms"
 npm ci
 npm run build
@@ -137,15 +172,24 @@ npm ci
 npm run build
 
 log "Configuring Nginx"
-sudo cp "$APP_DIR/deploy/aws/nginx.conf" /etc/nginx/sites-available/santamar
-sudo ln -sfn /etc/nginx/sites-available/santamar /etc/nginx/sites-enabled/santamar
 sudo rm -f /etc/nginx/sites-enabled/default
 
-if [[ -n "$SITE_DOMAIN" ]]; then
-  # Prefer named host for the public site when DNS is ready
-  sudo sed -i "s/server_name _;/server_name ${SITE_DOMAIN} ${PUBLIC_IP};/" /etc/nginx/sites-available/santamar
+if [[ -n "$SITE_DOMAIN" && -n "$CMS_DOMAIN" ]]; then
+  log "Installing dual-host Nginx (site=${SITE_DOMAIN}, cms=${CMS_DOMAIN})"
+  sed \
+    -e "s/__SITE_DOMAIN__/${SITE_DOMAIN}/g" \
+    -e "s/__CMS_DOMAIN__/${CMS_DOMAIN}/g" \
+    -e "s/__PUBLIC_IP__/${PUBLIC_IP:-_}/g" \
+    "$APP_DIR/deploy/aws/nginx-dual.conf" | sudo tee /etc/nginx/sites-available/santamar >/dev/null
+else
+  log "Installing single-host Nginx (path-based Strapi routes)"
+  sudo cp "$APP_DIR/deploy/aws/nginx.conf" /etc/nginx/sites-available/santamar
+  if [[ -n "$SITE_DOMAIN" ]]; then
+    sudo sed -i "s/server_name _;/server_name ${SITE_DOMAIN} ${PUBLIC_IP};/" /etc/nginx/sites-available/santamar
+  fi
 fi
 
+sudo ln -sfn /etc/nginx/sites-available/santamar /etc/nginx/sites-enabled/santamar
 sudo nginx -t
 sudo systemctl enable --now nginx
 sudo systemctl reload nginx
@@ -170,13 +214,20 @@ echo "y" | sudo ufw enable || true
 if [[ -n "$SITE_DOMAIN" && -n "$CMS_DOMAIN" && -n "$LETSENCRYPT_EMAIL" ]]; then
   log "Attempting Let's Encrypt for ${SITE_DOMAIN} and ${CMS_DOMAIN}"
   sudo apt-get install -y certbot python3-certbot-nginx
+  # Expand each server block separately so certbot does not copy site routing onto the CMS host.
   sudo certbot --nginx \
     -d "$SITE_DOMAIN" \
+    --non-interactive \
+    --agree-tos \
+    -m "$LETSENCRYPT_EMAIL" \
+    --redirect || log "Certbot for ${SITE_DOMAIN} skipped/failed — confirm DNS A records"
+  sudo certbot --nginx \
     -d "$CMS_DOMAIN" \
     --non-interactive \
     --agree-tos \
     -m "$LETSENCRYPT_EMAIL" \
-    --redirect || log "Certbot skipped/failed — confirm DNS A records, then re-run certbot on the instance"
+    --redirect || log "Certbot for ${CMS_DOMAIN} skipped/failed — confirm DNS A records"
+  sudo nginx -t && sudo systemctl reload nginx
 elif [[ -n "$SITE_DOMAIN" && -n "$LETSENCRYPT_EMAIL" ]]; then
   log "Attempting Let's Encrypt for ${SITE_DOMAIN}"
   sudo apt-get install -y certbot python3-certbot-nginx

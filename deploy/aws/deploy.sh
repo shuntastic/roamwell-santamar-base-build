@@ -100,19 +100,73 @@ else
   [[ -f "$SSH_KEY_PATH" ]] || die "Key pair exists in AWS but private key missing at ${SSH_KEY_PATH}"
 fi
 
+# --- VPC + public subnet (required for Elastic IP + SSH) ---
+# Prefer aws.env overrides, then the account default VPC, then recreate a default VPC.
+is_aws_none() { [[ -z "${1:-}" || "$1" == "None" || "$1" == "null" ]]; }
+
+resolve_public_subnet() {
+  local vpc="$1"
+  local subnet=""
+  subnet="$("${AWS[@]}" ec2 describe-subnets \
+    --filters "Name=vpc-id,Values=${vpc}" "Name=map-public-ip-on-launch,Values=true" \
+    --query 'Subnets | sort_by(@, &AvailabilityZone) | [0].SubnetId' --output text 2>/dev/null || true)"
+  if is_aws_none "$subnet"; then
+    # Subnets that inherit the main route table with an Internet Gateway
+    local main_has_igw
+    main_has_igw="$("${AWS[@]}" ec2 describe-route-tables \
+      --filters "Name=vpc-id,Values=${vpc}" "Name=association.main,Values=true" \
+      --query "RouteTables[0].Routes[?DestinationCidrBlock=='0.0.0.0/0' && starts_with(GatewayId, 'igw-')].GatewayId | [0]" \
+      --output text 2>/dev/null || true)"
+    if [[ "$main_has_igw" == igw-* ]]; then
+      subnet="$("${AWS[@]}" ec2 describe-subnets \
+        --filters "Name=vpc-id,Values=${vpc}" \
+        --query 'Subnets | sort_by(@, &AvailabilityZone) | [0].SubnetId' --output text 2>/dev/null || true)"
+    fi
+  fi
+  is_aws_none "$subnet" && return 1
+  printf '%s' "$subnet"
+}
+
+VPC_ID="${VPC_ID:-$(load_state VPC_ID)}"
+SUBNET_ID="${SUBNET_ID:-$(load_state SUBNET_ID)}"
+
+if is_aws_none "$VPC_ID"; then
+  VPC_ID="$("${AWS[@]}" ec2 describe-vpcs \
+    --filters Name=isDefault,Values=true \
+    --query 'Vpcs[0].VpcId' --output text 2>/dev/null || true)"
+fi
+
+if is_aws_none "$VPC_ID"; then
+  log "No default VPC in ${AWS_REGION}; creating one (required for Free Tier EC2 + public Elastic IP)"
+  VPC_ID="$("${AWS[@]}" ec2 create-default-vpc --query 'Vpc.VpcId' --output text)" \
+    || die "Could not create a default VPC. Set VPC_ID (and optionally SUBNET_ID) in deploy/aws/aws.env to an existing public VPC."
+  sleep 2
+fi
+
+is_aws_none "$VPC_ID" && die "VPC_ID resolved to empty/None. Set VPC_ID in deploy/aws/aws.env."
+save_state VPC_ID "$VPC_ID"
+log "Using VPC ${VPC_ID}"
+
+if is_aws_none "$SUBNET_ID"; then
+  if ! SUBNET_ID="$(resolve_public_subnet "$VPC_ID")"; then
+    die "No public subnet found in ${VPC_ID}. Set SUBNET_ID in deploy/aws/aws.env to a subnet with MapPublicIpOnLaunch or an Internet Gateway route."
+  fi
+fi
+save_state SUBNET_ID "$SUBNET_ID"
+log "Using subnet ${SUBNET_ID}"
+
 # --- Security group ---
 SG_NAME="${PROJECT_NAME}-sg"
 SG_ID="$(load_state SG_ID)"
 if [[ -z "$SG_ID" ]]; then
   SG_ID="$("${AWS[@]}" ec2 describe-security-groups \
-    --filters "Name=group-name,Values=${SG_NAME}" \
+    --filters "Name=group-name,Values=${SG_NAME}" "Name=vpc-id,Values=${VPC_ID}" \
     --query 'SecurityGroups[0].GroupId' --output text 2>/dev/null || true)"
-  [[ "$SG_ID" == "None" ]] && SG_ID=""
+  is_aws_none "$SG_ID" && SG_ID=""
 fi
 
 if [[ -z "$SG_ID" ]]; then
   log "Creating security group ${SG_NAME}"
-  VPC_ID="$("${AWS[@]}" ec2 describe-vpcs --filters Name=isDefault,Values=true --query 'Vpcs[0].VpcId' --output text)"
   SG_ID="$("${AWS[@]}" ec2 create-security-group \
     --group-name "$SG_NAME" \
     --description "Santamar Free Tier web + SSH" \
@@ -142,12 +196,12 @@ if [[ -n "$INSTANCE_ID" ]]; then
 fi
 
 if [[ -z "$INSTANCE_ID" ]]; then
-  log "Launching ${INSTANCE_TYPE} (Free Tier class)"
+  log "Launching ${INSTANCE_TYPE} (Free Tier class) in ${SUBNET_ID}"
   INSTANCE_ID="$("${AWS[@]}" ec2 run-instances \
     --image-id "$AMI_ID" \
     --instance-type "$INSTANCE_TYPE" \
     --key-name "$KEY_NAME" \
-    --security-group-ids "$SG_ID" \
+    --network-interfaces "DeviceIndex=0,SubnetId=${SUBNET_ID},Groups=${SG_ID},AssociatePublicIpAddress=true" \
     --count 1 \
     --tag-specifications "ResourceType=instance,Tags=[{Key=Name,Value=${PROJECT_NAME}},{Key=Project,Value=santamar}]" \
     --query 'Instances[0].InstanceId' --output text)"
@@ -189,16 +243,45 @@ if [[ -z "${NEXT_PUBLIC_STRAPI_URL:-}" ]]; then
   fi
 fi
 
-SSH_OPTS=(-i "$SSH_KEY_PATH" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10)
+# Ephemeral lab hosts often reuse an Elastic IP on a new instance; OpenSSH
+# "accept-new" refuses when the host key changed. Keep a deploy-local known_hosts
+# and refresh the entry whenever the instance behind the IP changes.
+KNOWN_HOSTS_FILE="${AWS_DIR}/.known_hosts"
+PREV_SSH_INSTANCE_ID="$(load_state SSH_INSTANCE_ID)"
+if [[ "$PREV_SSH_INSTANCE_ID" != "$INSTANCE_ID" ]]; then
+  log "Refreshing SSH host key for ${PUBLIC_IP} (instance changed: ${PREV_SSH_INSTANCE_ID:-none} → ${INSTANCE_ID})"
+  ssh-keygen -R "$PUBLIC_IP" -f "$KNOWN_HOSTS_FILE" >/dev/null 2>&1 || true
+  ssh-keygen -R "$PUBLIC_IP" >/dev/null 2>&1 || true
+  touch "$KNOWN_HOSTS_FILE"
+fi
+
+SSH_OPTS=(
+  -i "$SSH_KEY_PATH"
+  -o StrictHostKeyChecking=accept-new
+  -o UserKnownHostsFile="$KNOWN_HOSTS_FILE"
+  -o GlobalKnownHostsFile=/dev/null
+  -o ConnectTimeout=10
+  -o BatchMode=yes
+)
 SSH_HOST="${REMOTE_USER}@${PUBLIC_IP}"
+RSYNC_SSH="ssh -i ${SSH_KEY_PATH} -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=${KNOWN_HOSTS_FILE} -o GlobalKnownHostsFile=/dev/null"
 
 log "Waiting for SSH on ${SSH_HOST}"
+SSH_LAST_ERR=""
 for i in {1..36}; do
-  if ssh "${SSH_OPTS[@]}" "$SSH_HOST" 'echo ok' >/dev/null 2>&1; then
+  if SSH_LAST_ERR="$(ssh "${SSH_OPTS[@]}" "$SSH_HOST" 'echo ok' 2>&1)"; then
+    save_state SSH_INSTANCE_ID "$INSTANCE_ID"
     break
   fi
   sleep 5
-  [[ $i -eq 36 ]] && die "SSH never became available. Check SG SSH_CIDR and key."
+  if [[ $i -eq 36 ]]; then
+    die "SSH never became available for ${SSH_HOST}.
+Last error: ${SSH_LAST_ERR}
+Check: security group SSH_CIDR, key at ${SSH_KEY_PATH}, and that port 22 is reachable.
+If you replaced the instance behind this Elastic IP, remove stale host keys:
+  ssh-keygen -R ${PUBLIC_IP}
+  ssh-keygen -R ${PUBLIC_IP} -f ${KNOWN_HOSTS_FILE}"
+  fi
 done
 
 # Ensure remote app dir
@@ -216,15 +299,17 @@ rsync -az --delete \
   --exclude 'frontend/.next/' \
   --exclude 'cms/dist/' \
   --exclude 'cms/.tmp/' \
+  --exclude 'cms/public/uploads/' \
   --exclude 'cms/.strapi/' \
   --exclude '**/storybook-static/' \
   --exclude 'deploy/aws/aws.env' \
   --exclude 'deploy/aws/.deploy-state' \
+  --exclude 'deploy/aws/.known_hosts' \
   --exclude 'cms/.env' \
   --exclude 'cms/.env.production' \
   --exclude 'frontend/.env.local' \
   --exclude 'frontend/.env.production' \
-  -e "ssh -i ${SSH_KEY_PATH} -o StrictHostKeyChecking=accept-new" \
+  -e "$RSYNC_SSH" \
   "${ROOT_DIR}/" "${SSH_HOST}:${REMOTE_APP_DIR}/"
 
 log "Running remote bootstrap"
