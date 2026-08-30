@@ -6,9 +6,14 @@ node_modules/
 # Env / secrets
 .env
 .env.local
+.env.production
 .env.*.local
 !.env.example
 !**/.env.example
+
+# AWS deploy local config / state (never commit)
+deploy/aws/aws.env
+deploy/aws/.deploy-state
 
 # Local notes / credentials (never commit)
 _assets/
