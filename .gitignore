@@ -14,6 +14,7 @@ node_modules/
 # AWS deploy local config / state (never commit)
 deploy/aws/aws.env
 deploy/aws/.deploy-state
+deploy/aws/.known_hosts
 
 # Local notes / credentials (never commit)
 _assets/
@@ -35,6 +36,7 @@ debug-storybook.log
 # Uploads (keep placeholder only)
 cms/public/uploads/*
 !cms/public/uploads/.gitkeep
+cms/.migrate-backups/
 
 # GSAP extracted vendor copy (install from gsap-bonus.tgz)
 frontend/vendor/

@@ -124,15 +124,41 @@ What the script does:
 
 1. Authenticates with AWS  
 2. Resolves Ubuntu 22.04 AMI  
-3. Ensures EC2 key pair + security group (22/80/443)  
-4. Launches or reuses a Free Tier–class instance  
-5. Allocates/associates an Elastic IP  
-6. `rsync`s the repo (excludes `node_modules`, secrets, build artifacts)  
-7. SSHs in and runs `bootstrap-remote.sh` (Node 20, Nginx, build, PM2)
+3. Resolves a VPC (default VPC, or creates one if the account has none) + public subnet  
+4. Ensures EC2 key pair + security group (22/80/443)  
+5. Launches or reuses a Free Tier–class instance  
+6. Allocates/associates an Elastic IP  
+7. `rsync`s the repo (excludes `node_modules`, secrets, build artifacts)  
+8. SSHs in and runs `bootstrap-remote.sh` (Node 20, Nginx, build, PM2)
 
 First run often takes **15–30+ minutes** on `t3.micro` (npm install + two production builds).
 
 Idempotence: instance / SG / EIP IDs are stored in `deploy/aws/.deploy-state`. Re-running syncs code and re-bootstraps without necessarily creating a new instance.
+
+---
+
+## Migrate local CMS content → AWS
+
+`deploy.sh` syncs code but **not** the SQLite database (`cms/.tmp/`). Media under `cms/public/uploads/` is also left alone on redeploy so AWS content is not wiped. Use the migrate script when you want laptop content/images on the instance:
+
+```bash
+chmod +x deploy/aws/migrate-cms-data.sh
+
+# Preview
+./deploy/aws/migrate-cms-data.sh push --dry-run
+
+# Push local DB + uploads → EC2 (backs up remote first, restarts Strapi)
+./deploy/aws/migrate-cms-data.sh push
+
+# Uploads only / DB only
+./deploy/aws/migrate-cms-data.sh push --uploads-only
+./deploy/aws/migrate-cms-data.sh push --db-only
+
+# Pull AWS → laptop
+./deploy/aws/migrate-cms-data.sh pull
+```
+
+Stop local Strapi before a `pull` if it is running. Requires a prior successful deploy (`.deploy-state` + SSH key).
 
 ---
 
@@ -181,6 +207,9 @@ pm2 logs santamar-web
 
 # Redeploy code only (from laptop)
 ./deploy/aws/deploy.sh
+
+# Sync Strapi SQLite + uploads (from laptop)
+./deploy/aws/migrate-cms-data.sh push
 ```
 
 ### Tear down (stop billing)
@@ -195,11 +224,21 @@ aws ec2 release-address --allocation-id "$ALLOC_ID" --region us-east-1
 
 **Important:** An Elastic IP that is **allocated but not associated** incurs a charge. Release it when finished. Stopped instances can still incur EBS storage charges.
 
+### Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| `InvalidVpcId.Malformed` / vpc ID `'None'` | Account has no **default VPC** in the region | Re-run `./deploy/aws/deploy.sh` (script creates a default VPC). Or set `VPC_ID` / `SUBNET_ID` in `aws.env` to an existing public VPC/subnet. |
+| SSH never became available / host key changed | New EC2 instance reused the same Elastic IP; OpenSSH blocked the changed host key | Re-run deploy (script refreshes `deploy/aws/.known_hosts` when the instance ID changes). Or manually: `ssh-keygen -R ELASTIC_IP` |
+| SSH never became available (timeout) | `SSH_CIDR` blocks your IP, or wrong key | Confirm `SSH_KEY_PATH` matches `KEY_NAME`; temporarily use `0.0.0.0/0` only for debugging. |
+| Stuck on / OOM during `Building admin panel` | Strapi Vite admin build exceeds Node’s default ~1 GiB heap (worse with no swap) | Re-run deploy — bootstrap now sets `NODE_OPTIONS=--max-old-space-size=…` and creates a swapfile on small instances. Prefer `t3.small`+ for builds. |
+| Admin Content Manager: `Unexpected token <, "<!DOCTYPE "... is not valid JSON` | CMS host Nginx was sending `/content-manager` (etc.) to Next.js instead of Strapi | With `CMS_DOMAIN` set, CMS host must proxy **all** paths to Strapi (`nginx-dual.conf`). Single-host mode must also proxy plugin routes (`/content-manager`, `/i18n`, `/upload`, …). Re-run deploy or restore `deploy/aws/nginx-dual.conf` on the instance. |
+
 ---
 
 ## Design notes / limits
 
-- **`t3.micro` (1 GiB RAM)** is tight for two Node builds. The bootstrap builds sequentially; if `npm ci` / `next build` is OOM-killed, temporarily resize to `t3.small`, build, then resize back — or build artifacts CI-side later.
+- **`t3.micro` (1 GiB RAM)** is tight for two Node builds; prefer **`t3.small`** for first deploy. Bootstrap creates a swapfile and raises `NODE_OPTIONS=--max-old-space-size` so Strapi’s admin Vite build and `next build` are less likely to OOM. Builds still run sequentially.
 - **Same-origin Strapi URL** (`http://EIP`) avoids CORS issues in the Free Tier lab layout (`/api`, `/admin`, `/uploads` via Nginx).
 - **Do not** use S3 static website hosting for the Next app as-is (middleware + ISR need `next start`).
 - Amplify Hosting Free Tier can host Next separately, but you would still need a always-on host for Strapi — a **single EC2** usually wins on Free Tier simplicity and cost predictability.
@@ -209,5 +248,5 @@ aws ec2 release-address --allocation-id "$ALLOC_ID" --region us-east-1
 ## Related
 
 - LAMP / generic VPS: [`docs/DEPLOY-LAMP.md`](DEPLOY-LAMP.md)  
-- Scripts: [`deploy/aws/deploy.sh`](../deploy/aws/deploy.sh), [`deploy/aws/bootstrap-remote.sh`](../deploy/aws/bootstrap-remote.sh)  
+- Scripts: [`deploy/aws/deploy.sh`](../deploy/aws/deploy.sh), [`deploy/aws/bootstrap-remote.sh`](../deploy/aws/bootstrap-remote.sh), [`deploy/aws/migrate-cms-data.sh`](../deploy/aws/migrate-cms-data.sh)  
 - Config template: [`deploy/aws/aws.env.example`](../deploy/aws/aws.env.example)
