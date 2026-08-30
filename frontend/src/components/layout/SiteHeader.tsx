@@ -21,7 +21,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useTheme } from '@mui/material/styles';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { NavItem } from '@/types/cms';
+import type { NavItem, StrapiMedia } from '@/types/cms';
+import { SiteLogoMark } from '@/components/layout/SiteLogoMark';
 import { localeLabels, localeNames, locales, type Locale } from '@/lib/i18n';
 
 /** MUI `md` — 900px. Nav collapses to a hamburger below this width. */
@@ -30,6 +31,8 @@ const NAV_BREAKPOINT = 'md' as const;
 type Props = {
   locale: Locale;
   siteName: string;
+  logo?: StrapiMedia | null;
+  logoSvgMarkup?: string | null;
   items: NavItem[];
 };
 
@@ -166,7 +169,7 @@ function LocaleSelect({
   );
 }
 
-export function SiteHeader({ locale, siteName, items }: Props) {
+export function SiteHeader({ locale, siteName, logo, logoSvgMarkup, items }: Props) {
   const theme = useTheme();
   const pathname = usePathname();
   const sorted = [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -193,7 +196,7 @@ export function SiteHeader({ locale, siteName, items }: Props) {
             boxShadow: 'none',
           }
         : {
-            bgcolor: 'rgba(247, 251, 252, 0.3)',
+            bgcolor: 'rgba(247, 251, 252, 1.0)',
             color: 'text.primary',
             backdropFilter: 'blur(12px)',
             borderBottom: '1px solid',
@@ -206,19 +209,38 @@ export function SiteHeader({ locale, siteName, items }: Props) {
     <AppBar position="sticky" elevation={0} sx={headerSx}>
       <Container maxWidth={contentMaxWidth}>
         <Toolbar disableGutters sx={{ gap: 2, minHeight: headerHeight }}>
-          <Typography
-            component={Link}
-            href={`/${locale}`}
-            variant="h5"
-            sx={{
-              fontFamily: 'var(--font-display), "Times New Roman", serif',
-              textDecoration: 'none',
-              fontSize: '2.025rem',
-              color: headerStyle === 'solid' ? 'inherit' : 'secondary.main',
-            }}
-          >
-            {siteName}
-          </Typography>
+          {logo ? (
+            <Box
+              component={Link}
+              href={`/${locale}`}
+              aria-label={siteName}
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                lineHeight: 0,
+                flexShrink: 0,
+                height: { xs: 38, sm: 38 },
+                maxWidth: { xs: 150, sm: 200, md: 240 },
+              }}
+            >
+              <SiteLogoMark logo={logo} siteName={siteName} svgMarkup={logoSvgMarkup} />
+            </Box>
+          ) : (
+            <Typography
+              component={Link}
+              href={`/${locale}`}
+              variant="h5"
+              sx={{
+                fontFamily: 'var(--font-display), "Times New Roman", serif',
+                textDecoration: 'none',
+                fontSize: '2.025rem',
+                color: headerStyle === 'solid' ? 'inherit' : 'secondary.main',
+              }}
+            >
+              {siteName}
+            </Typography>
+          )}
 
           <Box
             component="nav"
@@ -356,7 +378,7 @@ export function SiteHeader({ locale, siteName, items }: Props) {
                     primary={item.label}
                     slotProps={{
                       primary: {
-                        fontWeight: active ? 600 : 400,
+                        sx: { fontWeight: active ? 600 : 400 },
                       },
                     }}
                   />

@@ -134,6 +134,15 @@ export function getStrapiMediaUrl(url?: string | null): string | null {
   return `${STRAPI_URL}${url}`;
 }
 
+export function isSvgMedia(
+  media: { mime?: string | null; url?: string | null } | null | undefined,
+  url?: string | null,
+): boolean {
+  if (!media && !url) return false;
+  const src = url || media?.url || '';
+  return media?.mime === 'image/svg+xml' || /\.svg($|\?)/i.test(src);
+}
+
 export async function getPageBySlug(slug: string, locale: Locale): Promise<CmsPage | null> {
   const normalized = slug === '' || slug === '/' ? 'home' : slug.replace(/^\/+|\/+$/g, '');
 
