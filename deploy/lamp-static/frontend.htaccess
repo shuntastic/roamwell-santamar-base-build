@@ -1,0 +1,45 @@
+# Apache config for the *static* Santamar frontend (DocumentRoot = frontend/out).
+# Copied to out/.htaccess by `npm run build:static`.
+#
+# Requires: AllowOverride All (or FileInfo + Options) for this vhost
+#           a2enmod rewrite headers
+#
+# Expected public URLs (trailing slash):
+#   /           → /en/
+#   /en/about/  → en/about/index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Keep real files and directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Root → default locale
+  RewriteRule ^$ /en/ [R=302,L]
+
+  # Locale home without trailing slash → with slash
+  RewriteRule ^(en|es|pt)$ /$1/ [R=302,L]
+
+  # Pretty paths → static export index.html
+  # /en/about  or /en/about/  → /en/about/index.html
+  RewriteRule ^(en|es|pt)/(.+?)/?$ /$1/$2/index.html [L]
+
+  # Locale root → /en/index.html
+  RewriteRule ^(en|es|pt)/?$ /$1/index.html [L]
+</IfModule>
+
+# Security headers (safe defaults for a static brochure site)
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Optional: if you place api-proxy.php at DocumentRoot/_lamp/api-proxy.php
+# and want same-origin /api/* → CMS, uncomment:
+#
+# <IfModule mod_rewrite.c>
+#   RewriteRule ^api/(.*)$ /_lamp/api-proxy.php?path=$1 [QSA,L]
+# </IfModule>

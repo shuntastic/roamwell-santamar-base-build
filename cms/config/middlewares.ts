@@ -1,5 +1,20 @@
 import type { Core } from '@strapi/strapi';
 
+function corsOrigins(): string[] {
+  const fromList = (process.env.FRONTEND_URLS || '')
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+  const single = process.env.FRONTEND_URL?.trim();
+  const origins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    ...(single ? [single] : []),
+    ...fromList,
+  ];
+  return [...new Set(origins)];
+}
+
 const config: Core.Config.Middlewares = [
   'strapi::logger',
   'strapi::errors',
@@ -20,11 +35,7 @@ const config: Core.Config.Middlewares = [
   {
     name: 'strapi::cors',
     config: {
-      origin: [
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        process.env.FRONTEND_URL,
-      ].filter(Boolean),
+      origin: corsOrigins(),
       headers: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
     },
   },
