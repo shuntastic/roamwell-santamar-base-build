@@ -59,9 +59,11 @@ Admin: [http://localhost:1337/admin](http://localhost:1337/admin)
 On first boot the bootstrap seed:
 
 - Creates locales `en`, `es`, `pt`
-- Creates the site pages above
-- Creates Navigation + Global settings
-- Opens Public API permissions for pages / navigation / global
+- Creates the primary **Site** (`santamar`, hostname from `PRIMARY_HOSTNAME`, default `localhost`)
+- Creates site-scoped pages + Navigation (brand fields live on Site; Global is deprecated)
+- Opens Public API permissions for pages / navigation / sites
+
+See [docs/MULTI-SITE.md](docs/MULTI-SITE.md) for secondary sites, hostnames, CORS, and `single_page` templates.
 
 Set `SEED_CONTENT=false` to skip seeding.
 
@@ -106,10 +108,18 @@ Club GreenSock package is committed as root `gsap-bonus.tgz` and installed into 
 
 | Target | Guide |
 | --- | --- |
-| **AWS Free Tier (EC2)** | **[docs/DEPLOY-AWS.md](docs/DEPLOY-AWS.md)** — `./deploy/aws/deploy.sh` |
-| **LAMP VPS** | **[docs/DEPLOY-LAMP.md](docs/DEPLOY-LAMP.md)** — Apache + MySQL + PM2 |
+| **Multi-site (hosts + templates)** | **[docs/MULTI-SITE.md](docs/MULTI-SITE.md)** — Sites, CORS, `multi_page` / `single_page` |
+| **AWS Free Tier (EC2)** | **[docs/DEPLOY-AWS.md](DEPLOY-AWS.md)** — `./deploy/aws/deploy.sh` |
+| **LAMP (Node reverse-proxy)** | **[docs/DEPLOY-LAMP.md](docs/DEPLOY-LAMP.md)** — Apache → PM2 Next + Strapi |
+| **LAMP (static DocumentRoot)** | **[docs/DEPLOY-LAMP-STATIC.md](docs/DEPLOY-LAMP-STATIC.md)** — `npm run build:web:static` → `frontend/out/` |
 
-Both run **Nginx/Apache reverse-proxy + Node (Strapi + Next)**. Neither is a PHP DocumentRoot app.
+### Static frontend on Apache (no Node for the site)
+
+```bash
+NEXT_PUBLIC_STRAPI_URL=https://cms.example.com npm run build:web:static
+# upload frontend/out/ (includes .htaccess) to the site DocumentRoot
+# set cms/.env FRONTEND_URL / FRONTEND_URLS to the www origin for CORS
+```
 
 ### AWS Free Tier (quick start)
 
@@ -121,7 +131,7 @@ chmod +x deploy/aws/deploy.sh deploy/aws/bootstrap-remote.sh
 ./deploy/aws/deploy.sh
 ```
 
-### LAMP (quick path)
+### LAMP Node reverse-proxy (quick path)
 
 1. MySQL — `deploy/mysql-setup.sql`
 2. CMS `.env` — `DATABASE_CLIENT=mysql`, `PUBLIC_URL`, `FRONTEND_URL`, secrets
@@ -130,15 +140,18 @@ chmod +x deploy/aws/deploy.sh deploy/aws/bootstrap-remote.sh
 5. `pm2 start deploy/ecosystem.config.js`
 6. Apache — `deploy/apache-web.conf` + `deploy/apache-cms.conf` (+ certbot)
 
-LAMP config artifacts: [`deploy/`](deploy/). AWS scripts: [`deploy/aws/`](deploy/aws/).
+Artifacts: [`deploy/`](deploy/), [`deploy/lamp-static/`](deploy/lamp-static/), [`deploy/aws/`](deploy/aws/).
 
 ## Content model notes
 
-- **Page** — localized collection; primary front-end document
-- **Navigation** — localized single type of nav items
-- **Global** — brand, contact, default SEO
+- **Site** — hostname-keyed tenant; brand/contact/SEO; `multi_page` or `single_page` template; `coastal` / `harbor` / `dune` theme
+- **Page** — localized collection scoped to a Site; primary front-end document
+- **Navigation** — localized collection scoped to a Site (nav items support page or section targets)
+- **Global** — deprecated; brand fields live on Site
 
-Front-end fetches published content with deep `populate` for dynamic sections (`frontend/src/lib/strapi.ts`). Populate keys must match the page schema — unknown keys make Strapi 5 return 400. If the CMS is offline, fallback nav/pages keep the framework browsable.
+Use **Provision site** in the Strapi admin to create a secondary Site (template + theme), starter content, and a Next deployment pack under `sites/<key>/`. See [docs/MULTI-SITE.md](docs/MULTI-SITE.md).
+
+Front-end resolves the Site from `Host` (or pinned `SITE_KEY`), then fetches published content with deep `populate` for dynamic sections (`frontend/src/lib/strapi.ts`). Populate keys must match the page schema — unknown keys make Strapi 5 return 400. If the CMS is offline, fallback nav/pages keep the framework browsable.
 
 ## Designer / developer workflow
 

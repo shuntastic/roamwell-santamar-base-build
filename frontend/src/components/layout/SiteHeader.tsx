@@ -21,7 +21,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useTheme } from '@mui/material/styles';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { NavItem, StrapiMedia } from '@/types/cms';
+import type { NavItem, SiteTemplate, StrapiMedia } from '@/types/cms';
 import { SiteLogoMark } from '@/components/layout/SiteLogoMark';
 import { localeLabels, localeNames, locales, type Locale } from '@/lib/i18n';
 
@@ -34,12 +34,31 @@ type Props = {
   logo?: StrapiMedia | null;
   logoSvgMarkup?: string | null;
   items: NavItem[];
+  template?: SiteTemplate;
 };
 
 function localizeHref(locale: Locale, url: string) {
   if (url.startsWith('http')) return url;
   const path = url === '/' ? '' : url;
   return `/${locale}${path}`;
+}
+
+function navHref(locale: Locale, item: NavItem, template: SiteTemplate): string {
+  const targetType = item.targetType || (template === 'single_page' && item.sectionAnchor ? 'section' : 'page');
+  if (targetType === 'section' && item.sectionAnchor) {
+    return `/${locale}#${item.sectionAnchor}`;
+  }
+  return localizeHref(locale, item.url || '/');
+}
+
+function scrollToAnchor(anchor: string) {
+  const el = document.getElementById(anchor);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  if (typeof window !== 'undefined') {
+    const url = `${window.location.pathname}${window.location.search}#${anchor}`;
+    window.history.replaceState(null, '', url);
+  }
 }
 
 function LocaleSelect({
@@ -169,16 +188,66 @@ function LocaleSelect({
   );
 }
 
-export function SiteHeader({ locale, siteName, logo, logoSvgMarkup, items }: Props) {
+export function SiteHeader({
+  locale,
+  siteName,
+  logo,
+  logoSvgMarkup,
+  items,
+  template = 'multi_page',
+}: Props) {
   const theme = useTheme();
   const pathname = usePathname();
   const sorted = [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const sectionAnchorKey = sorted
+    .map((item) => item.sectionAnchor)
+    .filter(Boolean)
+    .join('|');
   const { headerStyle, headerHeight, contentMaxWidth, navGap } = theme.layout;
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [activeAnchor, setActiveAnchor] = React.useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const hash = window.location.hash.replace(/^#/, '');
+    return hash || null;
+  });
+  const isSinglePage = template === 'single_page';
 
   React.useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
+    if (!isSinglePage || !sectionAnchorKey) return;
+
+    const anchors = sectionAnchorKey.split('|').filter(Boolean);
+    if (!anchors.length) return;
+
+    const elements = anchors
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => Boolean(el));
+
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]?.target?.id) {
+          setActiveAnchor(visible[0].target.id);
+        }
+      },
+      {
+        rootMargin: '-20% 0px -55% 0px',
+        threshold: [0.1, 0.25, 0.5],
+      },
+    );
+
+    elements.forEach((el) => observer.observe(el));
+
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash && anchors.includes(hash)) {
+      requestAnimationFrame(() => scrollToAnchor(hash));
+    }
+
+    return () => observer.disconnect();
+  }, [isSinglePage, sectionAnchorKey]);
 
   const headerSx =
     headerStyle === 'solid'
@@ -205,6 +274,82 @@ export function SiteHeader({ locale, siteName, logo, logoSvgMarkup, items }: Pro
 
   const closeMobile = () => setMobileOpen(false);
 
+  const homeHref = `/${locale}`;
+
+  const renderNavButton = (item: NavItem, opts?: { mobile?: boolean }) => {
+    const href = navHref(locale, item, template);
+    const targetType =
+      item.targetType || (isSinglePage && item.sectionAnchor ? 'section' : 'page');
+    const isSection = targetType === 'section' && Boolean(item.sectionAnchor);
+    const pathActive =
+      !isSection &&
+      (pathname === href || (item.url !== '/' && item.url && pathname.startsWith(localizeHref(locale, item.url))));
+    const sectionActive = isSection && activeAnchor === item.sectionAnchor;
+    const active = isSection ? sectionActive : pathActive;
+
+    const onClick = (event: React.MouseEvent) => {
+      if (isSection && item.sectionAnchor) {
+        event.preventDefault();
+        scrollToAnchor(item.sectionAnchor);
+        setActiveAnchor(item.sectionAnchor);
+      }
+      if (opts?.mobile) closeMobile();
+    };
+
+    if (opts?.mobile) {
+      return (
+        <ListItemButton
+          key={`${item.label}-${item.sectionAnchor || item.url}`}
+          component={Link}
+          href={href}
+          selected={Boolean(active)}
+          onClick={onClick}
+          sx={{
+            borderRadius: 1,
+            mx: 0.5,
+            '&.Mui-selected': {
+              color: 'secondary.main',
+            },
+          }}
+        >
+          <ListItemText
+            primary={item.label}
+            slotProps={{
+              primary: {
+                sx: { fontWeight: active ? 600 : 400 },
+              },
+            }}
+          />
+        </ListItemButton>
+      );
+    }
+
+    return (
+      <Button
+        key={`${item.label}-${item.sectionAnchor || item.url}`}
+        component={Link}
+        href={href}
+        onClick={onClick}
+        color={
+          headerStyle === 'solid'
+            ? 'inherit'
+            : active
+              ? 'secondary'
+              : 'inherit'
+        }
+        variant={active && headerStyle === 'solid' ? 'outlined' : 'text'}
+        size="small"
+        sx={
+          headerStyle === 'solid' && active
+            ? { borderColor: 'secondary.main', color: 'secondary.light' }
+            : undefined
+        }
+      >
+        {item.label}
+      </Button>
+    );
+  };
+
   return (
     <AppBar position="sticky" elevation={0} sx={headerSx}>
       <Container maxWidth={contentMaxWidth}>
@@ -212,8 +357,16 @@ export function SiteHeader({ locale, siteName, logo, logoSvgMarkup, items }: Pro
           {logo ? (
             <Box
               component={Link}
-              href={`/${locale}`}
+              href={homeHref}
               aria-label={siteName}
+              onClick={(event) => {
+                if (isSinglePage) {
+                  event.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.history.replaceState(null, '', homeHref);
+                  setActiveAnchor(null);
+                }
+              }}
               sx={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -229,8 +382,16 @@ export function SiteHeader({ locale, siteName, logo, logoSvgMarkup, items }: Pro
           ) : (
             <Typography
               component={Link}
-              href={`/${locale}`}
+              href={homeHref}
               variant="h5"
+              onClick={(event) => {
+                if (isSinglePage) {
+                  event.preventDefault();
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  window.history.replaceState(null, '', homeHref);
+                  setActiveAnchor(null);
+                }
+              }}
               sx={{
                 fontFamily: 'var(--font-display), "Times New Roman", serif',
                 textDecoration: 'none',
@@ -254,33 +415,7 @@ export function SiteHeader({ locale, siteName, logo, logoSvgMarkup, items }: Pro
               mr: 1.5,
             }}
           >
-            {sorted.map((item) => {
-              const href = localizeHref(locale, item.url);
-              const active = pathname === href || (item.url !== '/' && pathname.startsWith(href));
-              return (
-                <Button
-                  key={`${item.label}-${item.url}`}
-                  component={Link}
-                  href={href}
-                  color={
-                    headerStyle === 'solid'
-                      ? 'inherit'
-                      : active
-                        ? 'secondary'
-                        : 'inherit'
-                  }
-                  variant={active && headerStyle === 'solid' ? 'outlined' : 'text'}
-                  size="small"
-                  sx={
-                    headerStyle === 'solid' && active
-                      ? { borderColor: 'secondary.main', color: 'secondary.light' }
-                      : undefined
-                  }
-                >
-                  {item.label}
-                </Button>
-              );
-            })}
+            {sorted.map((item) => renderNavButton(item))}
           </Box>
 
           <Box
@@ -355,36 +490,7 @@ export function SiteHeader({ locale, siteName, logo, logoSvgMarkup, items }: Pro
           sx={{ pt: 1 }}
         >
           <List disablePadding>
-            {sorted.map((item) => {
-              const href = localizeHref(locale, item.url);
-              const active =
-                pathname === href || (item.url !== '/' && pathname.startsWith(href));
-              return (
-                <ListItemButton
-                  key={`${item.label}-${item.url}`}
-                  component={Link}
-                  href={href}
-                  selected={active}
-                  onClick={closeMobile}
-                  sx={{
-                    borderRadius: 1,
-                    mx: 0.5,
-                    '&.Mui-selected': {
-                      color: 'secondary.main',
-                    },
-                  }}
-                >
-                  <ListItemText
-                    primary={item.label}
-                    slotProps={{
-                      primary: {
-                        sx: { fontWeight: active ? 600 : 400 },
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              );
-            })}
+            {sorted.map((item) => renderNavButton(item, { mobile: true }))}
           </List>
         </Box>
 

@@ -23,14 +23,14 @@ type ThemeContextValue = {
 
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 
-function isThemeId(value: string | null): value is ThemeId {
+function isThemeId(value: string | null | undefined): value is ThemeId {
   return !!value && (themeIds as readonly string[]).includes(value);
 }
 
-function readStoredThemeId(): ThemeId {
-  if (typeof window === 'undefined') return defaultThemeId;
+function readStoredThemeId(fallback: ThemeId): ThemeId {
+  if (typeof window === 'undefined') return fallback;
   const stored = window.localStorage.getItem(STORAGE_KEY);
-  return isThemeId(stored) ? stored : defaultThemeId;
+  return isThemeId(stored) ? stored : fallback;
 }
 
 function readSwitcherDefault(): boolean {
@@ -43,24 +43,31 @@ function readSwitcherDefault(): boolean {
 
 type Props = {
   children: React.ReactNode;
+  /** Theme from the resolved CMS Site. Production uses this; the dev switcher may override. */
+  initialThemeId?: string | null;
 };
 
-export function AppThemeProvider({ children }: Props) {
-  const [themeId, setThemeIdState] = React.useState<ThemeId>(defaultThemeId);
+export function AppThemeProvider({ children, initialThemeId }: Props) {
+  const cmsTheme = isThemeId(initialThemeId) ? initialThemeId : defaultThemeId;
+  const [themeId, setThemeIdState] = React.useState<ThemeId>(cmsTheme);
   const [switcherVisible, setSwitcherVisibleState] = React.useState(false);
   const [ready, setReady] = React.useState(false);
 
   React.useEffect(() => {
-    setThemeIdState(readStoredThemeId());
-    setSwitcherVisibleState(readSwitcherDefault());
+    const switcherOn = readSwitcherDefault();
+    setSwitcherVisibleState(switcherOn);
+    // Dev switcher may override via localStorage; otherwise CMS theme wins.
+    setThemeIdState(switcherOn ? readStoredThemeId(cmsTheme) : cmsTheme);
     setReady(true);
-  }, []);
+  }, [cmsTheme]);
 
   React.useEffect(() => {
     if (!ready) return;
     document.documentElement.dataset.theme = themeId;
-    window.localStorage.setItem(STORAGE_KEY, themeId);
-  }, [themeId, ready]);
+    if (switcherVisible) {
+      window.localStorage.setItem(STORAGE_KEY, themeId);
+    }
+  }, [themeId, ready, switcherVisible]);
 
   React.useEffect(() => {
     if (!ready) return;

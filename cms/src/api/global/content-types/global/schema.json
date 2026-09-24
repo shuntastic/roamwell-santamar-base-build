@@ -4,8 +4,8 @@
   "info": {
     "singularName": "global",
     "pluralName": "globals",
-    "displayName": "Global",
-    "description": "Site-wide brand and contact settings"
+    "displayName": "Global (deprecated)",
+    "description": "DEPRECATED — brand/contact fields moved to Site. Kept for migration only."
   },
   "options": {
     "draftAndPublish": true

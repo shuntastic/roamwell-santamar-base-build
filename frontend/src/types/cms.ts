@@ -195,18 +195,20 @@ export type CmsPage = {
   locale?: string;
 };
 
-export type NavItem = {
-  id?: number;
-  label: string;
-  url: string;
-  order?: number;
-};
+export type SiteTemplate = 'multi_page' | 'single_page';
 
-export type Navigation = {
-  items?: NavItem[] | null;
-};
+export type SiteTheme = 'coastal' | 'harbor' | 'dune';
 
-export type GlobalSettings = {
+export type Site = {
+  id: number;
+  documentId: string;
+  name: string;
+  key: string;
+  hostname: string;
+  hostnames?: string[] | null;
+  isPrimary?: boolean | null;
+  template: SiteTemplate;
+  theme?: SiteTheme | null;
   siteName: string;
   tagline?: string | null;
   logo?: StrapiMedia | null;
@@ -216,3 +218,29 @@ export type GlobalSettings = {
   instagramUrl?: string | null;
   defaultSeo?: StrapiSeo | null;
 };
+
+export type NavItem = {
+  id?: number;
+  label: string;
+  url?: string | null;
+  order?: number;
+  targetType?: 'page' | 'section' | null;
+  sectionAnchor?: string | null;
+};
+
+export type Navigation = {
+  items?: NavItem[] | null;
+};
+
+/** Brand/contact fields for chrome (header/footer) — sourced from Site. */
+export type GlobalSettings = Pick<
+  Site,
+  | 'siteName'
+  | 'tagline'
+  | 'logo'
+  | 'contactEmail'
+  | 'contactPhone'
+  | 'address'
+  | 'instagramUrl'
+  | 'defaultSeo'
+>;

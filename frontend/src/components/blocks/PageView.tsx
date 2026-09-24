@@ -12,14 +12,20 @@ import { ThemeSection } from '@/components/layout/ThemeSection';
 type Props = {
   page: CmsPage;
   locale: string;
+  /** Ordered section anchors for single_page hash navigation. */
+  sectionAnchors?: string[] | null;
 };
 
-export function PageView({ page, locale }: Props) {
+export function PageView({ page, locale, sectionAnchors }: Props) {
   const hasHero = page.sections?.some((section) => section.__component === 'blocks.hero');
 
   return (
     <Box component="article">
-      <DynamicSections sections={page.sections} locale={locale} />
+      <DynamicSections
+        sections={page.sections}
+        locale={locale}
+        sectionAnchors={sectionAnchors}
+      />
 
       {!hasHero ? (
         <SectionReveal>

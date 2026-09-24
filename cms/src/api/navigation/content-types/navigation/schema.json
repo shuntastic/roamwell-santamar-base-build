@@ -1,11 +1,11 @@
 {
-  "kind": "singleType",
+  "kind": "collectionType",
   "collectionName": "navigations",
   "info": {
     "singularName": "navigation",
     "pluralName": "navigations",
     "displayName": "Navigation",
-    "description": "Primary site navigation structure"
+    "description": "Site-scoped navigation structure (one per site per locale)"
   },
   "options": {
     "draftAndPublish": true
@@ -16,6 +16,21 @@
     }
   },
   "attributes": {
+    "title": {
+      "type": "string",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
+    "site": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::site.site",
+      "inversedBy": "navigations",
+      "required": true
+    },
     "items": {
       "type": "component",
       "repeatable": true,

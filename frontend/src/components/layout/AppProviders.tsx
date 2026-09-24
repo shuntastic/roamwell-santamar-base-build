@@ -2,20 +2,12 @@
 
 import * as React from 'react';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
-import { AppThemeProvider } from '@/theme/ThemeContext';
-import { ThemeSwitcher } from '@/components/layout/ThemeSwitcher';
 
 type Props = {
   children: React.ReactNode;
 };
 
+/** Root providers that do not depend on the resolved Site (theme lives in locale layout). */
 export function AppProviders({ children }: Props) {
-  return (
-    <AppRouterCacheProvider>
-      <AppThemeProvider>
-        {children}
-        <ThemeSwitcher />
-      </AppThemeProvider>
-    </AppRouterCacheProvider>
-  );
+  return <AppRouterCacheProvider>{children}</AppRouterCacheProvider>;
 }
