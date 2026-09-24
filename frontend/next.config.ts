@@ -1,12 +1,16 @@
 import type { NextConfig } from 'next';
 
 /**
- * Production on LAMP runs `next start` behind Apache (not static export).
- * Locale middleware + ISR against Strapi require a long-lived Node process.
+ * Two production modes:
  *
- * Set NEXT_PUBLIC_STRAPI_URL to the *public* CMS origin before `next build`
- * (e.g. https://cms.santamar.example) so server and client fetch the same host.
+ * 1) Node (default) — `next build` + `next start` behind Apache/Nginx reverse-proxy.
+ * 2) Static LAMP — `STATIC_EXPORT=true` → `output: 'export'` into `frontend/out/`
+ *    for Apache DocumentRoot. Use `npm run build:static` (disables middleware).
+ *
+ * Set NEXT_PUBLIC_STRAPI_URL to the *public* CMS origin before building
+ * (e.g. https://cms.santamar.example).
  */
+const isStaticExport = process.env.STATIC_EXPORT === 'true';
 const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 
 let strapiHost: URL;
@@ -19,19 +23,28 @@ try {
 }
 
 const nextConfig: NextConfig = {
-  // Bind explicitly when started via PM2 / systemd on the LAMP host.
-  // Override with HOSTNAME / PORT env at runtime (`next start`).
   poweredByHeader: false,
-  images: {
-    remotePatterns: [
-      {
-        protocol: strapiHost.protocol.replace(':', '') as 'http' | 'https',
-        hostname: strapiHost.hostname,
-        port: strapiHost.port || undefined,
-        pathname: '/uploads/**',
-      },
-    ],
-  },
+  ...(isStaticExport
+    ? {
+        output: 'export' as const,
+        /** Apache serves directories as …/about/index.html more reliably with trailing slashes. */
+        trailingSlash: true,
+        images: {
+          unoptimized: true,
+        },
+      }
+    : {
+        images: {
+          remotePatterns: [
+            {
+              protocol: strapiHost.protocol.replace(':', '') as 'http' | 'https',
+              hostname: strapiHost.hostname,
+              port: strapiHost.port || undefined,
+              pathname: '/uploads/**',
+            },
+          ],
+        },
+      }),
 };
 
 export default nextConfig;

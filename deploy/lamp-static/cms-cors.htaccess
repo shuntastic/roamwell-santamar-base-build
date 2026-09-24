@@ -1,0 +1,33 @@
+# Apache fragment for the *CMS* vhost (cms.example.com → Strapi).
+# Include from the CMS VirtualHost or merge into deploy/apache-cms.conf.
+#
+# Purpose: allow browser calls from the static frontend on another subdomain
+# (e.g. https://www.example.com → https://cms.example.com/api/...).
+#
+# Prefer configuring Strapi CORS via FRONTEND_URL / FRONTEND_URLS in cms/.env.
+# Use these headers only if you also need Apache-level CORS (uploads, edge cases),
+# or when a temporary PHP proxy is not available.
+#
+#   a2enmod headers
+#   # then either:
+#   #   Include /var/www/santamar/deploy/lamp-static/cms-cors.htaccess
+#   # or paste into the CMS VirtualHost
+
+<IfModule mod_headers.c>
+  # Echo allowed frontend origin when it matches (replace with your site origin).
+  # For multiple origins, use Strapi FRONTEND_URLS instead of hard-coding here.
+  SetEnvIf Origin "^https://(www\.)?santamar\.example$" CORS_ALLOW_ORIGIN=$0
+  SetEnvIf Origin "^http://localhost(:[0-9]+)?$" CORS_ALLOW_ORIGIN=$0
+
+  Header always set Access-Control-Allow-Origin "%{CORS_ALLOW_ORIGIN}e" env=CORS_ALLOW_ORIGIN
+  Header always set Access-Control-Allow-Credentials "true" env=CORS_ALLOW_ORIGIN
+  Header always set Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE, OPTIONS" env=CORS_ALLOW_ORIGIN
+  Header always set Access-Control-Allow-Headers "Content-Type, Authorization, Origin, Accept" env=CORS_ALLOW_ORIGIN
+  Header always set Access-Control-Max-Age "86400" env=CORS_ALLOW_ORIGIN
+
+  # Short-circuit preflight
+  RewriteEngine On
+  RewriteCond %{REQUEST_METHOD} OPTIONS
+  RewriteCond %{ENV:CORS_ALLOW_ORIGIN} !^$
+  RewriteRule ^ - [R=204,L]
+</IfModule>
