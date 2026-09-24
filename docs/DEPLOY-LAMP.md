@@ -24,7 +24,11 @@ Apache (80/443)
                                cms/public/uploads (disk)
 ```
 
-Do **not** point Apache `DocumentRoot` at `frontend/out` or `.next`. Locale middleware and ISR require `next start`.
+Do **not** point Apache `DocumentRoot` at `frontend/out` or `.next` for **this** reverse-proxy guide — locale middleware and ISR require `next start`.
+
+For a **static** DocumentRoot deploy (no Node for the frontend), see **[DEPLOY-LAMP-STATIC.md](DEPLOY-LAMP-STATIC.md)**.
+
+For **multiple hostnames** on one Next + Strapi stack (primary + secondaries), see **[MULTI-SITE.md](MULTI-SITE.md)**. Add each public origin to `FRONTEND_URL` / `FRONTEND_URLS` for CORS.
 
 ---
 

@@ -8,6 +8,8 @@ const LOCALES: Array<{ code: LocaleCode; name: string }> = [
   { code: 'pt', name: 'Portuguese (pt)' },
 ];
 
+const PRIMARY_SITE_KEY = 'santamar';
+
 const SITE_PAGES = [
   { slug: 'home', title: 'Home', navLabel: 'Home', order: 0 },
   { slug: 'accommodations', title: 'Accommodations', navLabel: 'Accommodations', order: 1 },
@@ -155,6 +157,11 @@ function blocksIntro(text: string): Array<{
   ];
 }
 
+function primaryHostname(): string {
+  const raw = (process.env.PRIMARY_HOSTNAME || 'localhost').trim().toLowerCase();
+  return raw.replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/:\d+$/, '') || 'localhost';
+}
+
 async function ensureLocales(strapi: Core.Strapi) {
   for (const locale of LOCALES) {
     const existing = await strapi.db.query('plugin::i18n.locale').findOne({
@@ -173,15 +180,194 @@ async function ensureLocales(strapi: Core.Strapi) {
   }
 }
 
-async function ensurePages(strapi: Core.Strapi) {
+async function ensurePrimarySite(strapi: Core.Strapi) {
+  const hostname = primaryHostname();
+  const existing = await strapi.documents('api::site.site').findMany({
+    filters: { key: PRIMARY_SITE_KEY },
+    locale: 'en',
+    limit: 1,
+    populate: ['logo', 'defaultSeo'],
+  });
+
+  let globalBrand: Record<string, unknown> | null = null;
+  try {
+    globalBrand = await strapi.documents('api::global.global').findFirst({
+      locale: 'en',
+      populate: ['logo', 'defaultSeo'],
+    });
+  } catch {
+    globalBrand = null;
+  }
+
+  const brandFromGlobal = globalBrand
+    ? {
+        siteName: (globalBrand.siteName as string) || 'Santamar',
+        tagline: (globalBrand.tagline as string) || 'Coastal calm, curated stays',
+        contactEmail: (globalBrand.contactEmail as string) || 'hello@santamar.example',
+        contactPhone: (globalBrand.contactPhone as string) || '+1 000 000 0000',
+        address: (globalBrand.address as string) || 'Santamar',
+        instagramUrl: (globalBrand.instagramUrl as string) || 'https://www.instagram.com/',
+        defaultSeo: globalBrand.defaultSeo || {
+          metaTitle: 'Santamar',
+          metaDescription:
+            'Coastal hospitality with accommodations, local experiences, and easy booking.',
+        },
+        logo: (globalBrand.logo as { id?: number } | null)?.id,
+      }
+    : {
+        siteName: 'Santamar',
+        tagline: 'Coastal calm, curated stays',
+        contactEmail: 'hello@santamar.example',
+        contactPhone: '+1 000 000 0000',
+        address: 'Santamar',
+        instagramUrl: 'https://www.instagram.com/',
+        defaultSeo: {
+          metaTitle: 'Santamar',
+          metaDescription:
+            'Coastal hospitality with accommodations, local experiences, and easy booking.',
+        },
+      };
+
+  if (existing.length > 0) {
+    const site = existing[0];
+    const needsBrand = !site.contactEmail && Boolean(globalBrand);
+
+    await strapi.documents('api::site.site').update({
+      documentId: site.documentId,
+      locale: 'en',
+      data: {
+        hostname,
+        isPrimary: true,
+        template: (site.template as string) || 'multi_page',
+        theme: (site.theme as string) || 'coastal',
+        ...(needsBrand
+          ? {
+              siteName: brandFromGlobal.siteName,
+              tagline: brandFromGlobal.tagline,
+              contactEmail: brandFromGlobal.contactEmail,
+              contactPhone: brandFromGlobal.contactPhone,
+              address: brandFromGlobal.address,
+              instagramUrl: brandFromGlobal.instagramUrl,
+              defaultSeo: brandFromGlobal.defaultSeo as never,
+              ...(brandFromGlobal.logo ? { logo: brandFromGlobal.logo } : {}),
+            }
+          : {}),
+      },
+      status: 'published',
+    });
+
+    strapi.log.info(`[seed] Ensured primary site ${PRIMARY_SITE_KEY} → ${hostname}`);
+    return site.documentId as string;
+  }
+
+  const created = await strapi.documents('api::site.site').create({
+    locale: 'en',
+    data: {
+      name: 'Santamar',
+      key: PRIMARY_SITE_KEY,
+      hostname,
+      hostnames: hostname === 'localhost' ? ['127.0.0.1'] : [],
+      isPrimary: true,
+      template: 'multi_page',
+      theme: 'coastal',
+      siteName: brandFromGlobal.siteName,
+      tagline: brandFromGlobal.tagline,
+      contactEmail: brandFromGlobal.contactEmail,
+      contactPhone: brandFromGlobal.contactPhone,
+      address: brandFromGlobal.address,
+      instagramUrl: brandFromGlobal.instagramUrl,
+      defaultSeo: brandFromGlobal.defaultSeo as never,
+      ...(brandFromGlobal.logo ? { logo: brandFromGlobal.logo } : {}),
+    },
+    status: 'published',
+  });
+
+  for (const locale of ['es', 'pt'] as LocaleCode[]) {
+    const tagline =
+      locale === 'es'
+        ? 'Calma costera, estancias cuidadas'
+        : 'Calma costeira, estadias selecionadas';
+
+    let localizedGlobal: Record<string, unknown> | null = null;
+    try {
+      localizedGlobal = await strapi.documents('api::global.global').findFirst({
+        locale,
+      });
+    } catch {
+      localizedGlobal = null;
+    }
+
+    await strapi.documents('api::site.site').update({
+      documentId: created.documentId,
+      locale,
+      data: {
+        name: 'Santamar',
+        siteName: (localizedGlobal?.siteName as string) || 'Santamar',
+        tagline: (localizedGlobal?.tagline as string) || tagline,
+        address: (localizedGlobal?.address as string) || brandFromGlobal.address,
+      },
+      status: 'published',
+    });
+  }
+
+  strapi.log.info(`[seed] Created primary site ${PRIMARY_SITE_KEY} → ${hostname}`);
+  return created.documentId as string;
+}
+
+async function attachOrphanPages(strapi: Core.Strapi, siteDocumentId: string) {
+  const pages = await strapi.documents('api::page.page').findMany({
+    locale: 'en',
+    status: 'published',
+    populate: ['site'],
+    limit: 200,
+  });
+
+  for (const page of pages) {
+    const linked = (page as { site?: { documentId?: string } | null }).site;
+    if (linked?.documentId) continue;
+
+    await strapi.documents('api::page.page').update({
+      documentId: page.documentId,
+      locale: 'en',
+      data: { site: siteDocumentId },
+      status: 'published',
+    });
+    strapi.log.info(`[seed] Attached page /${page.slug} to site ${PRIMARY_SITE_KEY}`);
+  }
+}
+
+async function ensurePages(strapi: Core.Strapi, siteDocumentId: string) {
   for (const page of SITE_PAGES) {
     const existing = await strapi.documents('api::page.page').findMany({
-      filters: { slug: page.slug },
+      filters: {
+        slug: page.slug,
+        site: { documentId: siteDocumentId },
+      },
       locale: 'en',
       limit: 1,
     });
 
     if (existing.length > 0) {
+      continue;
+    }
+
+    // Also skip if an unscoped page with this slug already exists (attach handled separately)
+    const bySlug = await strapi.documents('api::page.page').findMany({
+      filters: { slug: page.slug },
+      locale: 'en',
+      limit: 1,
+      populate: ['site'],
+    });
+    if (bySlug.length > 0) {
+      const linked = (bySlug[0] as { site?: { documentId?: string } | null }).site;
+      if (!linked?.documentId) {
+        await strapi.documents('api::page.page').update({
+          documentId: bySlug[0].documentId,
+          locale: 'en',
+          data: { site: siteDocumentId },
+          status: 'published',
+        });
+      }
       continue;
     }
 
@@ -197,7 +383,7 @@ async function ensurePages(strapi: Core.Strapi) {
         title: enCopy.title,
         slug: page.slug,
         navLabel: enCopy.navLabel,
-        styledCopy: blocksIntro(enCopy.intro) as never,
+        site: siteDocumentId,
         sections:
           page.slug === 'home'
             ? [
@@ -262,7 +448,6 @@ async function ensurePages(strapi: Core.Strapi) {
           title: localized.title,
           slug: page.slug,
           navLabel: localized.navLabel,
-          styledCopy: blocksIntro(localized.intro) as never,
           seo: {
             metaTitle: `${localized.title} | Santamar`,
             metaDescription: localized.intro,
@@ -272,18 +457,21 @@ async function ensurePages(strapi: Core.Strapi) {
       });
     }
 
-    strapi.log.info(`[seed] Created page /${page.slug}`);
+    strapi.log.info(`[seed] Created page /${page.slug} for site ${PRIMARY_SITE_KEY}`);
   }
 }
 
-async function ensureNavigation(strapi: Core.Strapi) {
-  const existing = await strapi.documents('api::navigation.navigation').findFirst({
+async function ensureNavigation(strapi: Core.Strapi, siteDocumentId: string) {
+  const existing = await strapi.documents('api::navigation.navigation').findMany({
+    filters: { site: { documentId: siteDocumentId } },
     locale: 'en',
+    limit: 1,
   });
 
-  if (existing) return;
+  if (existing.length > 0) return;
 
   const pages = await strapi.documents('api::page.page').findMany({
+    filters: { site: { documentId: siteDocumentId } },
     locale: 'en',
     status: 'published',
   });
@@ -292,87 +480,43 @@ async function ensureNavigation(strapi: Core.Strapi) {
     const page = pages.find((entry) => entry.slug === def.slug);
     return {
       label: def.navLabel,
+      targetType: 'page' as const,
       url: def.slug === 'home' ? '/' : `/${def.slug}`,
       order: def.order,
       page: page?.documentId,
     };
   });
 
-  await strapi.documents('api::navigation.navigation').create({
+  const created = await strapi.documents('api::navigation.navigation').create({
     locale: 'en',
-    data: { items },
+    data: {
+      title: 'Primary',
+      site: siteDocumentId,
+      items,
+    },
     status: 'published',
   });
 
   for (const locale of ['es', 'pt'] as LocaleCode[]) {
     const localizedItems = SITE_PAGES.map((def) => ({
       label: PAGE_COPY[def.slug]?.[locale]?.navLabel ?? def.navLabel,
+      targetType: 'page' as const,
       url: def.slug === 'home' ? '/' : `/${def.slug}`,
       order: def.order,
     }));
 
-    const nav = await strapi.documents('api::navigation.navigation').findFirst({
-      locale: 'en',
-    });
-
-    if (!nav) continue;
-
     await strapi.documents('api::navigation.navigation').update({
-      documentId: nav.documentId,
+      documentId: created.documentId,
       locale,
-      data: { items: localizedItems },
+      data: {
+        title: 'Primary',
+        items: localizedItems,
+      },
       status: 'published',
     });
   }
 
-  strapi.log.info('[seed] Created navigation');
-}
-
-async function ensureGlobal(strapi: Core.Strapi) {
-  const existing = await strapi.documents('api::global.global').findFirst({
-    locale: 'en',
-  });
-
-  if (existing) return;
-
-  const created = await strapi.documents('api::global.global').create({
-    locale: 'en',
-    data: {
-      siteName: 'Santamar',
-      tagline: 'Coastal calm, curated stays',
-      contactEmail: 'hello@santamar.example',
-      contactPhone: '+1 000 000 0000',
-      address: 'Santamar',
-      instagramUrl: 'https://www.instagram.com/',
-      defaultSeo: {
-        metaTitle: 'Santamar',
-        metaDescription: 'Coastal hospitality with accommodations, local experiences, and easy booking.',
-      },
-    },
-    status: 'published',
-  });
-
-  await strapi.documents('api::global.global').update({
-    documentId: created.documentId,
-    locale: 'es',
-    data: {
-      siteName: 'Santamar',
-      tagline: 'Calma costera, estancias cuidadas',
-    },
-    status: 'published',
-  });
-
-  await strapi.documents('api::global.global').update({
-    documentId: created.documentId,
-    locale: 'pt',
-    data: {
-      siteName: 'Santamar',
-      tagline: 'Calma costeira, estadias selecionadas',
-    },
-    status: 'published',
-  });
-
-  strapi.log.info('[seed] Created global settings');
+  strapi.log.info(`[seed] Created navigation for site ${PRIMARY_SITE_KEY}`);
 }
 
 async function ensurePublicPermissions(strapi: Core.Strapi) {
@@ -386,6 +530,9 @@ async function ensurePublicPermissions(strapi: Core.Strapi) {
     'api::page.page.find',
     'api::page.page.findOne',
     'api::navigation.navigation.find',
+    'api::navigation.navigation.findOne',
+    'api::site.site.find',
+    'api::site.site.findOne',
     'api::global.global.find',
   ];
 
@@ -423,9 +570,10 @@ export default {
 
     try {
       await ensureLocales(strapi);
-      await ensurePages(strapi);
-      await ensureNavigation(strapi);
-      await ensureGlobal(strapi);
+      const siteDocumentId = await ensurePrimarySite(strapi);
+      await attachOrphanPages(strapi, siteDocumentId);
+      await ensurePages(strapi, siteDocumentId);
+      await ensureNavigation(strapi, siteDocumentId);
     } catch (error) {
       strapi.log.error('[seed] Failed to seed CMS framework content');
       strapi.log.error(error);

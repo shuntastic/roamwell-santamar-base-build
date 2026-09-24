@@ -287,7 +287,7 @@ export interface SharedLink extends Struct.ComponentSchema {
 export interface SharedNavItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_nav_items';
   info: {
-    description: 'Primary navigation item';
+    description: 'Navigation item — page route (multi_page) or section anchor (single_page)';
     displayName: 'Nav Item';
     icon: 'bulletList';
   };
@@ -295,7 +295,10 @@ export interface SharedNavItem extends Struct.ComponentSchema {
     label: Schema.Attribute.String & Schema.Attribute.Required;
     order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
     page: Schema.Attribute.Relation<'oneToOne', 'api::page.page'>;
-    url: Schema.Attribute.String & Schema.Attribute.Required;
+    sectionAnchor: Schema.Attribute.String;
+    targetType: Schema.Attribute.Enumeration<['page', 'section']> &
+      Schema.Attribute.DefaultTo<'page'>;
+    url: Schema.Attribute.String;
   };
 }
 

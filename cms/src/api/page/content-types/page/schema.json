@@ -5,7 +5,7 @@
     "singularName": "page",
     "pluralName": "pages",
     "displayName": "Page",
-    "description": "CMS-managed site page with dynamic sections and SEO"
+    "description": "CMS-managed site page with dynamic sections and SEO (scoped to a Site)"
   },
   "options": {
     "draftAndPublish": true
@@ -26,13 +26,12 @@
       "required": true
     },
     "slug": {
-      "type": "uid",
+      "type": "string",
       "pluginOptions": {
         "i18n": {
           "localized": true
         }
       },
-      "targetField": "title",
       "required": true
     },
     "navLabel": {
@@ -42,6 +41,13 @@
           "localized": true
         }
       }
+    },
+    "site": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::site.site",
+      "inversedBy": "pages",
+      "required": true
     },
     "sections": {
       "type": "dynamiczone",
