@@ -16,6 +16,12 @@ deploy/aws/aws.env
 deploy/aws/.deploy-state
 deploy/aws/.known_hosts
 
+# DigitalOcean CMS deploy local config / state (never commit)
+deploy/digitalocean/do.env
+deploy/digitalocean/.deploy-state
+deploy/digitalocean/.known_hosts
+deploy/digitalocean/frontend.env
+
 # Local notes / credentials (never commit)
 _assets/
 
@@ -57,3 +63,4 @@ frontend/gsap-bonus.tgz
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+deploy/digitalocean/.known_hosts.old
