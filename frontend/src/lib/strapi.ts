@@ -62,6 +62,7 @@ const PAGE_POPULATE: Record<string, unknown> = {
         populate: ['backgroundImage'],
       },
       'blocks.booking-calendar': true,
+      'blocks.booking-search': true,
       'blocks.contact-form': {
         populate: ['image'],
       },
@@ -116,25 +117,42 @@ async function strapiFetch<T>(path: string, query?: Record<string, unknown>): Pr
   const qs = query ? `?${buildQuery(query)}` : '';
   const url = `${STRAPI_URL}/api${path}${qs}`;
 
-  // Static LAMP export bakes CMS data at build time — ISR is unavailable.
-  const response = await fetch(url, isStaticExport ? { cache: 'force-cache' } : { next: { revalidate: 60 } });
+  // Prefer 127.0.0.1 in local .env — Strapi often binds IPv4 only; a wedged
+  // fetch with no timeout can hang the whole RSC render.
+  const controller = new AbortController();
+  const timeoutMs = isStaticExport ? 30_000 : 8_000;
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (!response.ok) {
-    let detail = '';
-    try {
-      const body = (await response.json()) as { error?: { message?: string } };
-      detail = body.error?.message ? ` — ${body.error.message}` : '';
-    } catch {
-      // ignore body parse failures
+  try {
+    // Static export must re-fetch CMS on every build. `force-cache` persists in
+    // `.next/cache` and will keep baking stale/fallback pages after CMS updates.
+    const response = await fetch(
+      url,
+      isStaticExport
+        ? { cache: 'no-store', signal: controller.signal }
+        : { next: { revalidate: 60 }, signal: controller.signal },
+    );
+
+    if (!response.ok) {
+      let detail = '';
+      try {
+        const body = (await response.json()) as { error?: { message?: string } };
+        detail = body.error?.message ? ` — ${body.error.message}` : '';
+      } catch {
+        // ignore body parse failures
+      }
+      throw new Error(`Strapi request failed (${response.status}): ${url}${detail}`);
     }
-    throw new Error(`Strapi request failed (${response.status}): ${url}${detail}`);
-  }
 
-  return response.json() as Promise<T>;
+    return response.json() as Promise<T>;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function logStrapiFailure(scope: string, error: unknown) {
-  if (process.env.NODE_ENV === 'production') return;
+  // Always log during static export — otherwise production builds silently bake fallbacks.
+  if (process.env.NODE_ENV === 'production' && process.env.STATIC_EXPORT !== 'true') return;
   console.error(`[strapi] ${scope}`, error);
 }
 
