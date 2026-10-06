@@ -15,7 +15,7 @@ import { HeroBlock } from '@/components/blocks/HeroBlock';
 import { ImageTextBlock } from '@/components/blocks/ImageTextBlock';
 import { ContactFormBlock } from '@/components/blocks/ContactFormBlock';
 import { ModalButtonBlock } from '@/components/blocks/ModalButtonBlock';
-import { BookingCalendarBlock } from '@/components/blocks/BookingCalendarBlock';
+import { EmbedWidgetBlock } from '@/components/blocks/EmbedWidgetBlock';
 import { StatementBlock } from '@/components/blocks/StatementBlock';
 import { SectionReveal } from '@/components/blocks/SectionReveal';
 import { LinkButton } from '@/components/ui/LinkButton';
@@ -269,7 +269,24 @@ export function DynamicSections({ sections, locale, sectionAnchors }: Props) {
             return (
               <SectionShell key={`${section.__component}-${section.id}`} id={anchorId}>
                 <SectionReveal>
-                  <BookingCalendarBlock block={section} />
+                  <EmbedWidgetBlock
+                    variant="calendar"
+                    title={section.title}
+                    embedCode={section.embedCode}
+                  />
+                </SectionReveal>
+              </SectionShell>
+            );
+
+          case 'blocks.booking-search':
+            return (
+              <SectionShell key={`${section.__component}-${section.id}`} id={anchorId}>
+                <SectionReveal>
+                  <EmbedWidgetBlock
+                    variant="search"
+                    title={section.title}
+                    embedCode={section.embedCode}
+                  />
                 </SectionReveal>
               </SectionShell>
             );

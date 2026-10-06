@@ -122,19 +122,14 @@ export type BlocksBookingCalendar = {
   __component: 'blocks.booking-calendar';
   id: number;
   title?: string | null;
-  cloudfrontSubdomain: string;
-  baseUrl: string;
-  listingId: number;
-  numberOfMonths?: '1' | '2' | null;
-  openInNewTab?: boolean | null;
-  buttonAction?: 'checkout' | 'inquiry' | null;
-  buttonText?: string | null;
-  clearButtonText?: string | null;
-  font?: string | null;
-  rounded?: boolean | null;
-  mainColor?: string | null;
-  frameColor?: string | null;
-  textColor?: string | null;
+  embedCode: string;
+};
+
+export type BlocksBookingSearch = {
+  __component: 'blocks.booking-search';
+  id: number;
+  title?: string | null;
+  embedCode: string;
 };
 
 export type BlocksContactForm = {
@@ -178,6 +173,7 @@ export type PageSection =
   | BlocksLocationMap
   | BlocksBookingCta
   | BlocksBookingCalendar
+  | BlocksBookingSearch
   | BlocksContactForm
   | BlocksModalButton
   | BlocksVideoEmbed;

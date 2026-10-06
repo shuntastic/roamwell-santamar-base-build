@@ -3,30 +3,12 @@ import type { Schema, Struct } from '@strapi/strapi';
 export interface BlocksBookingCalendar extends Struct.ComponentSchema {
   collectionName: 'components_blocks_booking_calendars';
   info: {
-    description: 'Hostaway embeddable availability calendar for a listing';
+    description: 'Paste Hostaway calendar embed code (div + script tags from Hostaway)';
     displayName: 'Booking Calendar';
     icon: 'calendar';
   };
   attributes: {
-    baseUrl: Schema.Attribute.String & Schema.Attribute.Required;
-    buttonAction: Schema.Attribute.Enumeration<['checkout', 'inquiry']> &
-      Schema.Attribute.DefaultTo<'checkout'>;
-    buttonText: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'Book now'>;
-    clearButtonText: Schema.Attribute.String &
-      Schema.Attribute.DefaultTo<'Clear dates'>;
-    cloudfrontSubdomain: Schema.Attribute.String &
-      Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'d2q3n06xhbi0am'>;
-    font: Schema.Attribute.String;
-    frameColor: Schema.Attribute.String;
-    listingId: Schema.Attribute.Integer & Schema.Attribute.Required;
-    mainColor: Schema.Attribute.String;
-    numberOfMonths: Schema.Attribute.Enumeration<['1', '2']> &
-      Schema.Attribute.DefaultTo<'2'>;
-    openInNewTab: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
-    rounded: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
-    textColor: Schema.Attribute.String;
+    embedCode: Schema.Attribute.Text & Schema.Attribute.Required;
     title: Schema.Attribute.String;
   };
 }
@@ -45,6 +27,19 @@ export interface BlocksBookingCta extends Struct.ComponentSchema {
     buttonLabel: Schema.Attribute.String &
       Schema.Attribute.DefaultTo<'Book Your Stay'>;
     headline: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface BlocksBookingSearch extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_booking_searches';
+  info: {
+    description: 'Paste Hostaway search / booking bar embed code (div + script tags from Hostaway)';
+    displayName: 'Booking Search';
+    icon: 'search';
+  };
+  attributes: {
+    embedCode: Schema.Attribute.Text & Schema.Attribute.Required;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -287,7 +282,7 @@ export interface SharedLink extends Struct.ComponentSchema {
 export interface SharedNavItem extends Struct.ComponentSchema {
   collectionName: 'components_shared_nav_items';
   info: {
-    description: 'Navigation item — page route (multi_page) or section anchor (single_page)';
+    description: 'Navigation item \u2014 page route (multi_page) or section anchor (single_page)';
     displayName: 'Nav Item';
     icon: 'bulletList';
   };
@@ -327,6 +322,7 @@ declare module '@strapi/strapi' {
     export interface ComponentSchemas {
       'blocks.booking-calendar': BlocksBookingCalendar;
       'blocks.booking-cta': BlocksBookingCta;
+      'blocks.booking-search': BlocksBookingSearch;
       'blocks.contact-form': BlocksContactForm;
       'blocks.feature-grid': BlocksFeatureGrid;
       'blocks.feature-item': BlocksFeatureItem;

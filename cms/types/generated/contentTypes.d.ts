@@ -446,7 +446,7 @@ export interface AdminUser extends Struct.CollectionTypeSchema {
 export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   collectionName: 'globals';
   info: {
-    description: 'DEPRECATED — brand/contact fields moved to Site. Kept for migration only.';
+    description: 'DEPRECATED \u2014 brand/contact fields moved to Site. Kept for migration only.';
     displayName: 'Global (deprecated)';
     pluralName: 'globals';
     singularName: 'global';
@@ -608,6 +608,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.location-map',
         'blocks.booking-cta',
         'blocks.booking-calendar',
+        'blocks.booking-search',
         'blocks.contact-form',
         'blocks.modal-button',
         'blocks.video-embed',
@@ -710,12 +711,12 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
         };
       }>;
     isPrimary: Schema.Attribute.Boolean &
-      Schema.Attribute.DefaultTo<false> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
         };
-      }>;
+      }> &
+      Schema.Attribute.DefaultTo<false>;
     key: Schema.Attribute.UID<'name'> &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
@@ -760,20 +761,20 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
       }>;
     template: Schema.Attribute.Enumeration<['multi_page', 'single_page']> &
       Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'multi_page'> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
         };
-      }>;
+      }> &
+      Schema.Attribute.DefaultTo<'multi_page'>;
     theme: Schema.Attribute.Enumeration<['coastal', 'harbor', 'dune']> &
       Schema.Attribute.Required &
-      Schema.Attribute.DefaultTo<'coastal'> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
           localized: false;
         };
-      }>;
+      }> &
+      Schema.Attribute.DefaultTo<'coastal'>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

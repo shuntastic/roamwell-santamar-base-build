@@ -130,6 +130,31 @@ After provisioning, add the public origin to `FRONTEND_URLS` in `cms/.env` and r
 | `FRONTEND_URL` / `FRONTEND_URLS` | CMS | CORS origins for each public site |
 | `SITE_FALLBACK_PRIMARY` | Frontend | Force primary fallback when host is unknown |
 | `SITE_KEY` / `SITE_HOSTNAME` | Frontend process | Pin one site (deployment packs set these) |
+| `NEXT_PUBLIC_EMBED_SCRIPT_ALLOWLIST` | Frontend | Host suffixes allowed for CMS-pasted booking embed scripts (default `cloudfront.net`) |
+
+## Booking embeds (Hostaway)
+
+Editors paste the **full** Hostaway snippet into page sections — do not map individual widget options in Strapi.
+
+| Block | Use |
+| --- | --- |
+| **Booking Search** | Hostaway search / booking bar (`widget.js` + `searchBar(...)`) |
+| **Booking Calendar** | Hostaway availability calendar (`calendar.js` + `hostawayCalendarWidget(...)`) |
+| **Booking CTA** | Simple marketing button (URL link) — not an embed |
+
+Workflow:
+
+1. Copy the embed HTML/JS from Hostaway (div + script tags).
+2. In Strapi, add **Booking Search** or **Booking Calendar** to a page’s sections.
+3. Paste into **Embed code**; optional **Title** for the section heading.
+4. Publish and rebuild the static frontend if you use LAMP export.
+
+Safety on the frontend:
+
+- Markup is sanitized (scripts stripped from HTML) before mount.
+- External `<script src>` hosts must match `NEXT_PUBLIC_EMBED_SCRIPT_ALLOWLIST` (default: `*.cloudfront.net`).
+- Inline init scripts run only after allowlisted scripts load, via real `<script>` elements (not `eval` of the raw paste).
+- Only authenticated CMS users can edit embed code.
 
 ## Deploy notes
 

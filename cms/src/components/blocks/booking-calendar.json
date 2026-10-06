@@ -2,7 +2,7 @@
   "collectionName": "components_blocks_booking_calendars",
   "info": {
     "displayName": "Booking Calendar",
-    "description": "Hostaway embeddable availability calendar for a listing",
+    "description": "Paste Hostaway calendar embed code (div + script tags from Hostaway)",
     "icon": "calendar"
   },
   "options": {},
@@ -10,56 +10,9 @@
     "title": {
       "type": "string"
     },
-    "cloudfrontSubdomain": {
-      "type": "string",
-      "default": "d2q3n06xhbi0am",
+    "embedCode": {
+      "type": "text",
       "required": true
-    },
-    "baseUrl": {
-      "type": "string",
-      "required": true
-    },
-    "listingId": {
-      "type": "integer",
-      "required": true
-    },
-    "numberOfMonths": {
-      "type": "enumeration",
-      "enum": ["1", "2"],
-      "default": "2"
-    },
-    "openInNewTab": {
-      "type": "boolean",
-      "default": true
-    },
-    "buttonAction": {
-      "type": "enumeration",
-      "enum": ["checkout", "inquiry"],
-      "default": "checkout"
-    },
-    "buttonText": {
-      "type": "string",
-      "default": "Book now"
-    },
-    "clearButtonText": {
-      "type": "string",
-      "default": "Clear dates"
-    },
-    "font": {
-      "type": "string"
-    },
-    "rounded": {
-      "type": "boolean",
-      "default": true
-    },
-    "mainColor": {
-      "type": "string"
-    },
-    "frameColor": {
-      "type": "string"
-    },
-    "textColor": {
-      "type": "string"
     }
   }
 }
