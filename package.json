@@ -6,13 +6,16 @@
     "node": ">=20 <21"
   },
   "scripts": {
+    "dev": "bash scripts/dev.sh",
     "dev:cms": "npm run develop --prefix cms",
     "dev:web": "npm run dev --prefix frontend",
+    "dev:all": "bash scripts/dev.sh --storybook",
     "build:cms": "npm run build --prefix cms",
     "build:web": "npm run build --prefix frontend",
     "build:web:static": "npm run build:static --prefix frontend",
     "start:cms": "npm run start --prefix cms",
     "start:web": "npm run start --prefix frontend",
-    "storybook": "npm run storybook --prefix frontend"
+    "storybook": "npm run storybook --prefix frontend",
+    "deploy:do-cms": "bash deploy/digitalocean/deploy.sh"
   }
 }
