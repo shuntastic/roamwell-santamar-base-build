@@ -231,15 +231,31 @@ async function ensurePrimarySite(strapi: Core.Strapi) {
   if (existing.length > 0) {
     const site = existing[0];
     const needsBrand = !site.contactEmail && Boolean(globalBrand);
+    const aliases =
+      hostname === 'localhost'
+        ? ['127.0.0.1']
+        : Array.from(
+            new Set(
+              [
+                ...((Array.isArray(site.hostnames) ? site.hostnames : []) as string[]),
+                'localhost',
+                '127.0.0.1',
+              ]
+                .map((h) => String(h || '').trim().toLowerCase())
+                .filter((h) => h && h !== hostname),
+            ),
+          );
 
     await strapi.documents('api::site.site').update({
       documentId: site.documentId,
       locale: 'en',
       data: {
         hostname,
+        hostnames: aliases,
         isPrimary: true,
-        template: (site.template as string) || 'multi_page',
-        theme: (site.theme as string) || 'coastal',
+        template: site.template === 'single_page' ? 'single_page' : 'multi_page',
+        theme:
+          site.theme === 'harbor' || site.theme === 'dune' ? site.theme : 'coastal',
         ...(needsBrand
           ? {
               siteName: brandFromGlobal.siteName,
@@ -255,6 +271,9 @@ async function ensurePrimarySite(strapi: Core.Strapi) {
       },
       status: 'published',
     });
+
+    // Localized site rows are required before pages can link `site` in es/pt.
+    await ensureSiteLocales(strapi, site.documentId as string, brandFromGlobal);
 
     strapi.log.info(`[seed] Ensured primary site ${PRIMARY_SITE_KEY} → ${hostname}`);
     return site.documentId as string;
@@ -282,7 +301,25 @@ async function ensurePrimarySite(strapi: Core.Strapi) {
     status: 'published',
   });
 
+  await ensureSiteLocales(strapi, created.documentId as string, brandFromGlobal);
+
+  strapi.log.info(`[seed] Created primary site ${PRIMARY_SITE_KEY} → ${hostname}`);
+  return created.documentId as string;
+}
+
+async function ensureSiteLocales(
+  strapi: Core.Strapi,
+  siteDocumentId: string,
+  brandFromGlobal: Record<string, unknown>,
+) {
   for (const locale of ['es', 'pt'] as LocaleCode[]) {
+    const existingLocale = await strapi.documents('api::site.site').findMany({
+      filters: { key: PRIMARY_SITE_KEY },
+      locale,
+      limit: 1,
+    });
+    if (existingLocale.length > 0) continue;
+
     const tagline =
       locale === 'es'
         ? 'Calma costera, estancias cuidadas'
@@ -298,20 +335,22 @@ async function ensurePrimarySite(strapi: Core.Strapi) {
     }
 
     await strapi.documents('api::site.site').update({
-      documentId: created.documentId,
+      documentId: siteDocumentId,
       locale,
       data: {
         name: 'Santamar',
+        key: PRIMARY_SITE_KEY,
         siteName: (localizedGlobal?.siteName as string) || 'Santamar',
         tagline: (localizedGlobal?.tagline as string) || tagline,
-        address: (localizedGlobal?.address as string) || brandFromGlobal.address,
+        address:
+          (localizedGlobal?.address as string) ||
+          (brandFromGlobal.address as string) ||
+          'Santamar',
       },
       status: 'published',
     });
+    strapi.log.info(`[seed] Ensured site locale ${locale} for ${PRIMARY_SITE_KEY}`);
   }
-
-  strapi.log.info(`[seed] Created primary site ${PRIMARY_SITE_KEY} → ${hostname}`);
-  return created.documentId as string;
 }
 
 async function attachOrphanPages(strapi: Core.Strapi, siteDocumentId: string) {
@@ -448,6 +487,8 @@ async function ensurePages(strapi: Core.Strapi, siteDocumentId: string) {
           title: localized.title,
           slug: page.slug,
           navLabel: localized.navLabel,
+          // Required when i18n creates a new locale entry.
+          site: siteDocumentId,
           seo: {
             metaTitle: `${localized.title} | Santamar`,
             metaDescription: localized.intro,
@@ -510,6 +551,8 @@ async function ensureNavigation(strapi: Core.Strapi, siteDocumentId: string) {
       locale,
       data: {
         title: 'Primary',
+        // Required relation must be present when i18n creates a new locale entry.
+        site: siteDocumentId,
         items: localizedItems,
       },
       status: 'published',
