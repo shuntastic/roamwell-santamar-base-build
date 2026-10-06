@@ -165,14 +165,14 @@ function defaultSectionsForSlug(slug: string, siteName: string, intro: string) {
   if (slug === 'home') {
     return [
       {
-        __component: 'blocks.hero',
+        __component: 'blocks.hero' as const,
         headline: siteName,
         subheadline: intro,
         description: blocksIntro(intro) as never,
         cta: {
           label: 'Book Your Stay',
           url: '/book-your-stay',
-          variant: 'primary',
+          variant: 'primary' as const,
         },
       },
     ];
@@ -180,7 +180,7 @@ function defaultSectionsForSlug(slug: string, siteName: string, intro: string) {
   if (slug === 'contact') {
     return [
       {
-        __component: 'blocks.contact-form',
+        __component: 'blocks.contact-form' as const,
         title: 'Contact',
         intro,
         submitLabel: 'Send Message',
@@ -191,7 +191,7 @@ function defaultSectionsForSlug(slug: string, siteName: string, intro: string) {
   if (slug === 'book-your-stay') {
     return [
       {
-        __component: 'blocks.booking-cta',
+        __component: 'blocks.booking-cta' as const,
         headline: 'Book Your Stay',
         body: intro,
         bookingUrl: '#booking',
@@ -202,7 +202,7 @@ function defaultSectionsForSlug(slug: string, siteName: string, intro: string) {
   if (slug === 'location') {
     return [
       {
-        __component: 'blocks.location-map',
+        __component: 'blocks.location-map' as const,
         title: 'Find Us',
         address: siteName,
         directionsLabel: 'Get Directions',
@@ -232,7 +232,7 @@ export async function createMultiPageStarter(
         slug: page.slug,
         navLabel: enCopy.navLabel,
         site: siteDocumentId,
-        sections: defaultSectionsForSlug(page.slug, siteName, enCopy.intro),
+        sections: defaultSectionsForSlug(page.slug, siteName, enCopy.intro) as never,
         seo: {
           metaTitle: `${enCopy.title} | ${siteName}`,
           metaDescription: enCopy.intro,
@@ -251,6 +251,7 @@ export async function createMultiPageStarter(
           title: localized.title,
           slug: page.slug,
           navLabel: localized.navLabel,
+          site: siteDocumentId,
           seo: {
             metaTitle: `${localized.title} | ${siteName}`,
             metaDescription: localized.intro,
@@ -298,7 +299,11 @@ export async function createMultiPageStarter(
     await strapi.documents('api::navigation.navigation').update({
       documentId: nav.documentId,
       locale,
-      data: { title: 'Primary', items: localizedItems },
+      data: {
+        title: 'Primary',
+        site: siteDocumentId,
+        items: localizedItems,
+      },
       status: 'published',
     });
   }
@@ -316,7 +321,7 @@ export async function createSinglePageStarter(
       headline: siteName,
       subheadline: 'A single-page stay narrative',
       description: blocksIntro(`Welcome to ${siteName}. Scroll to explore.`) as never,
-      cta: { label: 'Book', url: '#book', variant: 'primary' },
+      cta: { label: 'Book', url: '#book', variant: 'primary' as const },
     },
     {
       __component: 'blocks.statement',
@@ -378,6 +383,7 @@ export async function createSinglePageStarter(
         title: locale === 'es' ? 'Inicio' : 'Início',
         slug: 'home',
         navLabel: locale === 'es' ? 'Inicio' : 'Início',
+        site: siteDocumentId,
       },
       status: 'published',
     });
@@ -418,7 +424,11 @@ export async function createSinglePageStarter(
     await strapi.documents('api::navigation.navigation').update({
       documentId: nav.documentId,
       locale,
-      data: { title: 'Primary', items: localizedItems },
+      data: {
+        title: 'Primary',
+        site: siteDocumentId,
+        items: localizedItems,
+      },
       status: 'published',
     });
   }
