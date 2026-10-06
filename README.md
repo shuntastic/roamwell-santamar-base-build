@@ -33,7 +33,8 @@ Each page supports:
 - `blocks.media-gallery`
 - `blocks.location-map`
 - `blocks.booking-cta`
-- `blocks.booking-calendar`
+- `blocks.booking-calendar` (paste Hostaway calendar embed)
+- `blocks.booking-search` (paste Hostaway search bar embed)
 - `blocks.contact-form`
 - `blocks.modal-button`
 - `blocks.video-embed`
@@ -45,18 +46,40 @@ Each page supports:
 - Node.js **20.x** (recommended for Strapi)
 - npm 10+
 
-### 1. CMS
+### Start everything (recommended)
+
+From the repo root:
 
 ```bash
-cd cms
-cp .env.example .env   # if needed
-npm install
-npm run develop
+npm run dev
+# or: ./scripts/dev.sh
+# optional: npm run dev:all   # also Storybook on :6006
+# optional: ./scripts/dev.sh --install
 ```
 
-Admin: [http://localhost:1337/admin](http://localhost:1337/admin)
+That script copies missing env files from the examples, installs `cms/` + `frontend/` deps when needed, then starts:
 
-On first boot the bootstrap seed:
+| App | URL |
+| --- | --- |
+| Strapi CMS | [http://localhost:1337](http://localhost:1337) — admin at `/admin` |
+| Next.js site | [http://localhost:3000](http://localhost:3000) → `/en` |
+| Storybook (with `--storybook` / `dev:all`) | [http://localhost:6006](http://localhost:6006) |
+
+Ctrl+C stops all processes.
+
+### Manual (one app at a time)
+
+```bash
+# CMS
+cd cms && cp .env.example .env   # if needed
+npm install && npm run develop
+
+# Frontend (separate terminal)
+cd frontend && cp .env.example .env.local
+npm install && npm run dev
+```
+
+On first CMS boot the bootstrap seed:
 
 - Creates locales `en`, `es`, `pt`
 - Creates the primary **Site** (`santamar`, hostname from `PRIMARY_HOSTNAME`, default `localhost`)
@@ -66,17 +89,6 @@ On first boot the bootstrap seed:
 See [docs/MULTI-SITE.md](docs/MULTI-SITE.md) for secondary sites, hostnames, CORS, and `single_page` templates.
 
 Set `SEED_CONTENT=false` to skip seeding.
-
-### 2. Frontend
-
-```bash
-cd frontend
-cp .env.example .env.local
-npm install
-npm run dev
-```
-
-Site: [http://localhost:3000](http://localhost:3000) → redirects to `/en`.
 
 ### Theme switching (dev)
 
@@ -109,6 +121,7 @@ Club GreenSock package is committed as root `gsap-bonus.tgz` and installed into 
 | Target | Guide |
 | --- | --- |
 | **Multi-site (hosts + templates)** | **[docs/MULTI-SITE.md](docs/MULTI-SITE.md)** — Sites, CORS, `multi_page` / `single_page` |
+| **DigitalOcean (CMS only)** | **[docs/DEPLOY-DIGITALOCEAN.md](docs/DEPLOY-DIGITALOCEAN.md)** — `./deploy/digitalocean/deploy.sh` + FTP frontend |
 | **AWS Free Tier (EC2)** | **[docs/DEPLOY-AWS.md](DEPLOY-AWS.md)** — `./deploy/aws/deploy.sh` |
 | **LAMP (Node reverse-proxy)** | **[docs/DEPLOY-LAMP.md](docs/DEPLOY-LAMP.md)** — Apache → PM2 Next + Strapi |
 | **LAMP (static DocumentRoot)** | **[docs/DEPLOY-LAMP-STATIC.md](docs/DEPLOY-LAMP-STATIC.md)** — `npm run build:web:static` → `frontend/out/` |

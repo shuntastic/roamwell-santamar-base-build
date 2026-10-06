@@ -66,6 +66,7 @@
         "blocks.location-map",
         "blocks.booking-cta",
         "blocks.booking-calendar",
+        "blocks.booking-search",
         "blocks.contact-form",
         "blocks.modal-button",
         "blocks.video-embed"

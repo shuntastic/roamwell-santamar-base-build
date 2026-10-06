@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blocks_booking_searches",
+  "info": {
+    "displayName": "Booking Search",
+    "description": "Paste Hostaway search / booking bar embed code (div + script tags from Hostaway)",
+    "icon": "search"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "embedCode": {
+      "type": "text",
+      "required": true
+    }
+  }
+}
