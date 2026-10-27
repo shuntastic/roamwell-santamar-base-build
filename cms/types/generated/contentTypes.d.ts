@@ -522,6 +522,35 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
   };
 }
 
+export interface ApiMediaCategoryMediaCategory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'media_categories';
+  info: {
+    displayName: 'Media Categories';
+    pluralName: 'media-categories';
+    singularName: 'media-category';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    categoryname: Schema.Attribute.String;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::media-category.media-category'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiNavigationNavigation extends Struct.CollectionTypeSchema {
   collectionName: 'navigations';
   info: {
@@ -605,6 +634,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.image-text',
         'blocks.feature-grid',
         'blocks.media-gallery',
+        'blocks.media-grid',
         'blocks.location-map',
         'blocks.booking-cta',
         'blocks.booking-calendar',
@@ -1293,6 +1323,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::global.global': ApiGlobalGlobal;
+      'api::media-category.media-category': ApiMediaCategoryMediaCategory;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::page.page': ApiPagePage;
       'api::site.site': ApiSiteSite;

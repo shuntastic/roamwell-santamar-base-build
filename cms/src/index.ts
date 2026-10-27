@@ -577,6 +577,10 @@ async function ensurePublicPermissions(strapi: Core.Strapi) {
     'api::site.site.find',
     'api::site.site.findOne',
     'api::global.global.find',
+    // Media grid filters relate to this collection. Without find, the public
+    // page API strips categoryname and the frontend cannot render the pills.
+    'api::media-category.media-category.find',
+    'api::media-category.media-category.findOne',
   ];
 
   for (const action of actions) {

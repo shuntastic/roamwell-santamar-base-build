@@ -1,0 +1,18 @@
+{
+  "kind": "collectionType",
+  "collectionName": "media_categories",
+  "info": {
+    "singularName": "media-category",
+    "pluralName": "media-categories",
+    "displayName": "Media Categories"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "categoryname": {
+      "type": "string"
+    }
+  }
+}

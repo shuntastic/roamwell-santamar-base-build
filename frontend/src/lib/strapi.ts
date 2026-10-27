@@ -57,6 +57,26 @@ const PAGE_POPULATE: Record<string, unknown> = {
           },
         },
       },
+      'blocks.media-grid': {
+        populate: {
+          categories: {
+            populate: {
+              media_categories: true,
+            },
+          },
+          items: {
+            populate: {
+              media: true,
+              poster: true,
+              categories: {
+                populate: {
+                  media_categories: true,
+                },
+              },
+            },
+          },
+        },
+      },
       'blocks.location-map': true,
       'blocks.booking-cta': {
         populate: ['backgroundImage'],

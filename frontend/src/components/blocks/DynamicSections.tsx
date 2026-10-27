@@ -13,6 +13,7 @@ import { StyledCopy } from '@/components/ui/StyledCopy';
 import { Slideshow } from '@/components/slideshow/Slideshow';
 import { HeroBlock } from '@/components/blocks/HeroBlock';
 import { ImageTextBlock } from '@/components/blocks/ImageTextBlock';
+import { MediaGridBlock } from '@/components/blocks/MediaGridBlock';
 import { ContactFormBlock } from '@/components/blocks/ContactFormBlock';
 import { ModalButtonBlock } from '@/components/blocks/ModalButtonBlock';
 import { EmbedWidgetBlock } from '@/components/blocks/EmbedWidgetBlock';
@@ -170,6 +171,15 @@ export function DynamicSections({ sections, locale, sectionAnchors }: Props) {
               <SectionShell key={`${section.__component}-${section.id}`} id={anchorId}>
                 <SectionReveal>
                   <Slideshow slideshow={section.slideshow} />
+                </SectionReveal>
+              </SectionShell>
+            );
+
+          case 'blocks.media-grid':
+            return (
+              <SectionShell key={`${section.__component}-${section.id}`} id={anchorId}>
+                <SectionReveal>
+                  <MediaGridBlock block={section} />
                 </SectionReveal>
               </SectionShell>
             );
