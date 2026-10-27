@@ -73,7 +73,6 @@ export function ModalButtonBlock({ block }: Props) {
               sx={{
                 pr: 6,
                 fontFamily: 'var(--font-display), "Times New Roman", serif',
-                fontWeight: 400,
               }}
             >
               {block.modalTitle}

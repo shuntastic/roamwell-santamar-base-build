@@ -95,7 +95,14 @@ export function HeroBlock({ block, locale }: Props) {
             <Typography
               className="hero-sub"
               variant="body1"
-              sx={{ mt: 2, maxWidth: 520, fontSize: { xs: '1.2rem', md: '1.5rem' }, fontWeight: 600, opacity: 1.0, letterSpacing: '0.03em' }}
+              sx={{
+                mt: 2,
+                maxWidth: 520,
+                fontSize: { xs: '1.2rem', md: '1.5rem' },
+                fontWeight: theme.layout.id === 'blackbox' ? 400 : 600,
+                opacity: 1.0,
+                letterSpacing: '0.03em',
+              }}
             >
               {block.subheadline}
             </Typography>

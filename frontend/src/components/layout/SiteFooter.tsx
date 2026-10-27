@@ -15,6 +15,7 @@ type Props = {
 export function SiteFooter({ global }: Props) {
   const theme = useTheme();
   const solid = theme.layout.headerStyle === 'solid';
+  const flat = theme.layout.headerStyle === 'flat';
   const instagramUrl = global?.instagramUrl?.trim();
 
   return (
@@ -25,7 +26,7 @@ export function SiteFooter({ global }: Props) {
         py: theme.layout.sectionPaddingY,
         borderTop: '1px solid',
         borderColor: 'divider',
-        bgcolor: solid ? 'primary.main' : 'action.hover',
+        bgcolor: solid ? 'primary.main' : flat ? 'background.default' : 'action.hover',
         color: solid ? 'primary.contrastText' : 'inherit',
       }}
     >

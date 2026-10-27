@@ -1,12 +1,13 @@
 /**
  * Theme system entry points.
  *
- * - `themes` / `getTheme(id)` — three visual systems (coastal, harbor, dune)
+ * - `themes` / `getTheme(id)` — visual systems (coastal, harbor, dune, blackbox)
  * - `theme.layout` — layout tokens each component should prefer over hard-coded spacing
  * - `AppThemeProvider` + `ThemeSwitcher` — runtime switching while developing
  * - Shared fonts: Bentham (display) + Instrument Sans (body) via CSS variables
  */
 export { themes, getTheme, theme } from '@/theme/theme';
+export { ThemeFonts, BLACKBOX_TYPEKIT_HREF } from '@/theme/ThemeFonts';
 export { AppThemeProvider, useAppTheme } from '@/theme/ThemeContext';
 export {
   themeIds,

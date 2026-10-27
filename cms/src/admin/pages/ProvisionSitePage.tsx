@@ -168,6 +168,9 @@ export default function ProvisionSitePage() {
                   harbor — ink & brass, solid header
                 </SingleSelectOption>
                 <SingleSelectOption value="dune">dune — warm sand & olive</SingleSelectOption>
+                <SingleSelectOption value="blackbox">
+                  blackbox — Widescreen & Mokoko, cool gray field
+                </SingleSelectOption>
               </SingleSelect>
             </Field.Root>
 

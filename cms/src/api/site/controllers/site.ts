@@ -13,7 +13,7 @@ import {
 } from '../services/site-content';
 
 const TEMPLATES: SiteTemplate[] = ['multi_page', 'single_page'];
-const THEMES: SiteTheme[] = ['coastal', 'harbor', 'dune'];
+const THEMES: SiteTheme[] = ['coastal', 'harbor', 'dune', 'blackbox'];
 
 function normalizeHostname(raw: string): string {
   return raw

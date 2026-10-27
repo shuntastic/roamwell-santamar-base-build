@@ -24,7 +24,6 @@ export function StatementBlock({ block }: Props) {
         component="p"
         sx={{
           fontFamily: 'var(--font-display), "Times New Roman", serif',
-          fontWeight: 400,
           maxWidth: 720,
           lineHeight: 1.25,
           color: 'primary.main',

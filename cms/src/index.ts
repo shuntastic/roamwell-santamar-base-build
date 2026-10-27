@@ -255,7 +255,9 @@ async function ensurePrimarySite(strapi: Core.Strapi) {
         isPrimary: true,
         template: site.template === 'single_page' ? 'single_page' : 'multi_page',
         theme:
-          site.theme === 'harbor' || site.theme === 'dune' ? site.theme : 'coastal',
+          site.theme === 'harbor' || site.theme === 'dune' || site.theme === 'blackbox'
+            ? site.theme
+            : 'coastal',
         ...(needsBrand
           ? {
               siteName: brandFromGlobal.siteName,
