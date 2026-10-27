@@ -47,6 +47,7 @@ export function StyledCopy({ content, color = 'text.secondary' }: Props) {
         '& p': { mb: 2 },
         '& h2, & h3': { mt: 3, mb: 1.5 },
         '& p:last-child, & ul:last-child, & ol:last-child': { mb: 0 },
+        mx: 'auto',
         maxWidth: 760,
       }}
     >
