@@ -2,6 +2,7 @@ import type { Preview } from '@storybook/nextjs-vite';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import React from 'react';
+import { ThemeFonts } from '../src/theme/ThemeFonts';
 import { getTheme } from '../src/theme/theme';
 import { themeIds, themeLabels, type ThemeId } from '../src/theme/types';
 
@@ -42,6 +43,7 @@ const preview: Preview = {
 
       return (
         <ThemeProvider theme={theme}>
+          <ThemeFonts themeId={themeId} />
           <CssBaseline />
           <div
             data-theme={themeId}

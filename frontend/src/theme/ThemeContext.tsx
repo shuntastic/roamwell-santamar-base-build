@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeFonts } from '@/theme/ThemeFonts';
 import { getTheme } from '@/theme/theme';
 import {
   defaultThemeId,
@@ -113,6 +114,7 @@ export function AppThemeProvider({ children, initialThemeId }: Props) {
   return (
     <ThemeContext.Provider value={value}>
       <MuiThemeProvider theme={muiTheme}>
+        <ThemeFonts themeId={themeId} />
         <CssBaseline />
         {children}
       </MuiThemeProvider>

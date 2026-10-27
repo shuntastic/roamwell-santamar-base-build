@@ -1,4 +1,4 @@
-export const themeIds = ['coastal', 'harbor', 'dune'] as const;
+export const themeIds = ['coastal', 'harbor', 'dune', 'blackbox'] as const;
 
 export type ThemeId = (typeof themeIds)[number];
 
@@ -8,18 +8,20 @@ export const themeLabels: Record<ThemeId, string> = {
   coastal: 'Coastal',
   harbor: 'Harbor',
   dune: 'Dune',
+  blackbox: 'Black Box',
 };
 
 export const themeDescriptions: Record<ThemeId, string> = {
   coastal: 'Atlantic teal, soft glass header, rounded CTAs',
   harbor: 'Ink & brass, solid header, squared geometry',
   dune: 'Warm sand & olive, airy header, soft editorial rhythm',
+  blackbox: 'Widescreen & Mokoko, stone type on a cool gray field',
 };
 
 export type LayoutTokens = {
   id: ThemeId;
   label: string;
-  headerStyle: 'glass' | 'solid' | 'minimal';
+  headerStyle: 'glass' | 'solid' | 'minimal' | 'flat';
   headerHeight: number;
   contentMaxWidth: 'md' | 'lg' | 'xl';
   sectionPaddingY: { xs: number; md: number };

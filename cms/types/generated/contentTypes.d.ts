@@ -797,7 +797,9 @@ export interface ApiSiteSite extends Struct.CollectionTypeSchema {
         };
       }> &
       Schema.Attribute.DefaultTo<'multi_page'>;
-    theme: Schema.Attribute.Enumeration<['coastal', 'harbor', 'dune']> &
+    theme: Schema.Attribute.Enumeration<
+      ['coastal', 'harbor', 'dune', 'blackbox']
+    > &
       Schema.Attribute.Required &
       Schema.Attribute.SetPluginOptions<{
         i18n: {

@@ -226,7 +226,7 @@ export type CmsPage = {
 
 export type SiteTemplate = 'multi_page' | 'single_page';
 
-export type SiteTheme = 'coastal' | 'harbor' | 'dune';
+export type SiteTheme = 'coastal' | 'harbor' | 'dune' | 'blackbox';
 
 export type Site = {
   id: number;

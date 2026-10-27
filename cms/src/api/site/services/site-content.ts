@@ -3,7 +3,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 export type SiteTemplate = 'multi_page' | 'single_page';
-export type SiteTheme = 'coastal' | 'harbor' | 'dune';
+export type SiteTheme = 'coastal' | 'harbor' | 'dune' | 'blackbox';
 export type LocaleCode = 'en' | 'es' | 'pt';
 
 export const SITE_PAGES = [

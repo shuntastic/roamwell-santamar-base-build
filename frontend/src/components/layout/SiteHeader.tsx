@@ -364,7 +364,15 @@ export function SiteHeader({
             borderBottom: 'none',
             boxShadow: 'none',
           }
-        : {
+        : headerStyle === 'flat'
+          ? {
+              bgcolor: 'background.default',
+              color: 'text.primary',
+              borderBottom: '1px solid',
+              borderColor: 'divider',
+              boxShadow: 'none',
+            }
+          : {
               bgcolor: 'rgba(247, 251, 252, 1.0)',
               color: 'text.primary',
             backdropFilter: 'blur(12px)',
@@ -406,7 +414,10 @@ export function SiteHeader({
             borderRadius: 1,
             mx: 0.5,
             '&.Mui-selected': {
-              color: 'secondary.main',
+              color: headerStyle === 'flat' ? 'text.primary' : 'secondary.main',
+              ...(headerStyle === 'flat'
+                ? { textDecoration: 'underline', textUnderlineOffset: '0.28em' }
+                : {}),
             },
           }}
         >
@@ -429,7 +440,7 @@ export function SiteHeader({
         href={href}
         onClick={onClick}
         color={
-          headerStyle === 'solid'
+          headerStyle === 'solid' || headerStyle === 'flat'
             ? 'inherit'
             : active
               ? 'secondary'
@@ -438,9 +449,11 @@ export function SiteHeader({
         variant={active && headerStyle === 'solid' ? 'outlined' : 'text'}
         size="small"
         sx={
-          headerStyle === 'solid' && active
-            ? { borderColor: 'secondary.main', color: 'secondary.light' }
-            : undefined
+          headerStyle === 'flat' && active
+            ? { textDecoration: 'underline', textUnderlineOffset: '0.35em' }
+            : headerStyle === 'solid' && active
+              ? { borderColor: 'secondary.main', color: 'secondary.light' }
+              : undefined
         }
       >
         {item.label}
@@ -490,7 +503,10 @@ export function SiteHeader({
                 fontFamily: 'var(--font-display), "Times New Roman", serif',
                 textDecoration: 'none',
                 fontSize: '2.025rem',
-                color: headerStyle === 'solid' ? 'inherit' : 'secondary.main',
+                color:
+                  headerStyle === 'solid' || headerStyle === 'flat'
+                    ? 'inherit'
+                    : 'secondary.main',
               }}
             >
               {siteName}

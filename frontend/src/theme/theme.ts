@@ -4,6 +4,12 @@ import { createTheme, type Theme, type ThemeOptions } from '@mui/material/styles
 import { sharedTypography } from '@/theme/typography';
 import type { LayoutTokens, ThemeId } from '@/theme/types';
 
+type ContainedButtonTokens = {
+  backgroundColor: string;
+  color: string;
+  hoverBackgroundColor: string;
+};
+
 type ThemeDefinition = {
   id: ThemeId;
   layout: LayoutTokens;
@@ -12,9 +18,33 @@ type ThemeDefinition = {
   backgroundImage: string;
   buttonContainedHoverShadow: string;
   buttonRadius: number | string;
+  /** Filled buttons. When set, every contained color uses this fill. */
+  containedButton?: ContainedButtonTokens;
   /** Per-theme typography overrides merged onto `sharedTypography`. */
   typography?: ThemeOptions['typography'];
 };
+
+const BLACKBOX_BUTTON: ContainedButtonTokens = {
+  backgroundColor: '#c1e1ff',
+  color: '#332b1b',
+  hoverBackgroundColor: '#7f97af',
+};
+
+function containedButtonOverrides(tokens: ContainedButtonTokens | undefined) {
+  if (!tokens) return {};
+  const filled = {
+    backgroundColor: tokens.backgroundColor,
+    color: tokens.color,
+    '&:hover': {
+      backgroundColor: tokens.hoverBackgroundColor,
+      color: tokens.color,
+    },
+  };
+  return {
+    containedPrimary: filled,
+    containedSecondary: filled,
+  };
+}
 
 function buildTheme(definition: ThemeDefinition): Theme {
   return createTheme(
@@ -34,15 +64,31 @@ function buildTheme(definition: ThemeDefinition): Theme {
             },
             contained: {
               boxShadow: 'none',
+              ...(definition.containedButton
+                ? {
+                    backgroundColor: definition.containedButton.backgroundColor,
+                    color: definition.containedButton.color,
+                  }
+                : {}),
               '&:hover': {
                 boxShadow: definition.buttonContainedHoverShadow,
+                ...(definition.containedButton
+                  ? {
+                      backgroundColor: definition.containedButton.hoverBackgroundColor,
+                      color: definition.containedButton.color,
+                    }
+                  : {}),
               },
             },
+            ...containedButtonOverrides(definition.containedButton),
           },
         },
         MuiCssBaseline: {
           styleOverrides: {
             body: {
+              backgroundColor: (
+                definition.palette.background as { default?: string } | undefined
+              )?.default,
               backgroundImage: definition.backgroundImage,
               backgroundAttachment: 'fixed',
               minHeight: '100vh',
@@ -201,10 +247,96 @@ const dune = buildTheme({
     'radial-gradient(ellipse 80% 50% at 80% -5%, rgba(196, 122, 74, 0.16), transparent 55%), radial-gradient(ellipse 70% 45% at 0% 10%, rgba(63, 79, 58, 0.1), transparent 50%), linear-gradient(165deg, #F6F0E4 0%, #F3EBDD 50%, #EBE2D2 100%)',
 });
 
+const blackboxHeading = {
+  fontFamily: '"widescreen", sans-serif',
+  fontWeight: 700,
+  fontStyle: 'normal',
+  letterSpacing: 'normal',
+} as const;
+
+const blackboxBody = {
+  fontFamily: '"mokoko", serif',
+  fontWeight: 400,
+  fontStyle: 'normal',
+} as const;
+
+/** Black Box — Widescreen titles, Mokoko body, stone type on a cool gray field. */
+const blackbox = buildTheme({
+  id: 'blackbox',
+  layout: {
+    id: 'blackbox',
+    label: 'Black Box',
+    headerStyle: 'flat',
+    headerHeight: 72,
+    contentMaxWidth: 'lg',
+    sectionPaddingY: { xs: 6, md: 10 },
+    heroMinHeight: { xs: '88vh', md: '92vh' },
+    buttonRadius: 0,
+    cardRadius: 0,
+    navGap: 1,
+    mediaGridGap: 1,
+    mediaGridRadius: 0,
+    mediaGridFullBleed: true,
+    mediaGridTitle: {
+      maxWidth: '100%',
+      background: 'rgba(255, 255, 255, 0.55)',
+      // backgroundImage: 'linear-gradient(to bottom, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0))',
+    },
+  },
+  palette: {
+    mode: 'light',
+    primary: {
+      main: '#332b1b',
+      light: '#5c5142',
+      dark: '#1c170f',
+      contrastText: '#c1e1ff',
+    },
+    secondary: {
+      main: '#c1e1ff',
+      light: '#c5d2de',
+      dark: '#5d7590',
+      contrastText: '#332b1b',
+    },
+    background: {
+      default: '#e9ecf1',
+      paper: '#f7f8fa',
+    },
+    text: {
+      primary: '#332b1b',
+      secondary: '#332b1b',
+    },
+    divider: 'rgba(51, 43, 27, 0.16)',
+  },
+  typography: {
+    fontFamily: blackboxBody.fontFamily,
+    fontWeightRegular: 400,
+    fontWeightMedium: 400,
+    h1: blackboxHeading,
+    h2: blackboxHeading,
+    h3: blackboxHeading,
+    h4: blackboxHeading,
+    h5: blackboxHeading,
+    h6: blackboxHeading,
+    subtitle1: blackboxBody,
+    subtitle2: blackboxBody,
+    body1: blackboxBody,
+    body2: blackboxBody,
+    button: blackboxBody,
+    caption: blackboxBody,
+    overline: blackboxBody,
+  },
+  shape: { borderRadius: 0 },
+  buttonRadius: 0,
+  containedButton: BLACKBOX_BUTTON,
+  buttonContainedHoverShadow: 'none',
+  backgroundImage: 'none',
+});
+
 export const themes: Record<ThemeId, Theme> = {
   coastal,
   harbor,
   dune,
+  blackbox,
 };
 
 export function getTheme(id: ThemeId): Theme {

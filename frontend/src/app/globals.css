@@ -4,6 +4,12 @@
   --coral: #c45c26;
 }
 
+/* Beats the root next/font class so Black Box can swap display and body faces. */
+html[data-theme='blackbox'] {
+  --font-display: "widescreen", sans-serif;
+  --font-body: "mokoko", serif;
+}
+
 * {
   box-sizing: border-box;
 }
