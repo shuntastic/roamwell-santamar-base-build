@@ -70,7 +70,7 @@ export function SiteFooter({ global }: Props) {
             >
               {[global?.address, global?.contactEmail, global?.contactPhone]
                 .filter(Boolean)
-                .join(' · ')}
+                .join(' | ')}
             </Typography>
           </Box>
 
