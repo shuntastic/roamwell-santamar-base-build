@@ -124,12 +124,14 @@ async function strapiFetch<T>(path: string, query?: Record<string, unknown>): Pr
   const timer = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
-    // Static export must re-fetch CMS on every build. `force-cache` persists in
-    // `.next/cache` and will keep baking stale/fallback pages after CMS updates.
+    // `output: 'export'` rejects `cache: 'no-store'` (it is dynamic). Use
+    // force-cache so the fetch is allowed during static generation. The static
+    // build script deletes `frontend/.next` first, so this cache does not
+    // survive into the next export.
     const response = await fetch(
       url,
       isStaticExport
-        ? { cache: 'no-store', signal: controller.signal }
+        ? { cache: 'force-cache', signal: controller.signal }
         : { next: { revalidate: 60 }, signal: controller.signal },
     );
 

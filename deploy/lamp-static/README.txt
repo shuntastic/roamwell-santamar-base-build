@@ -1,7 +1,15 @@
 Santamar — static LAMP frontend utilities
 ========================================
 
-This folder is copied into DocumentRoot/_lamp/ by `npm run build:static`.
+This folder is copied into DocumentRoot/_lamp/ by `npm run build:static`
+and by `npm run build:web:static:local`.
+
+Local CMS build (`npm run build:web:static:local`)
+-------------------------------------------------
+Bakes pages from the laptop Strapi (cms/.tmp/data.db) and copies
+cms/public/uploads into DocumentRoot/uploads. Media URLs are same-origin
+/uploads/… so Apache does not need a live CMS. Re-run the command after
+content changes, then re-upload frontend/out/.
 
 Files
 -----
