@@ -1,0 +1,39 @@
+{
+  "collectionName": "components_blocks_media_grids",
+  "info": {
+    "displayName": "Media Grid",
+    "description": "Filterable grid of images and videos. A tile opens a lightbox with previous and next controls.",
+    "icon": "apps"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "description": "Optional heading above the grid."
+    },
+    "maxColumns": {
+      "type": "integer",
+      "required": true,
+      "default": 3,
+      "min": 1,
+      "max": 6,
+      "description": "Maximum columns on a wide screen. Narrower screens use fewer columns, and never more than this number."
+    },
+    "showItemTitles": {
+      "type": "boolean",
+      "default": true,
+      "description": "Show each item title under its tile. A title or caption still appears along the bottom of the lightbox when you enter one."
+    },
+    "categories": {
+      "type": "component",
+      "repeatable": true,
+      "component": "blocks.media-grid-category",
+      "description": "Filter pills, in the order they should appear. Tag each media item with the same label. Matching ignores capitalization and extra spaces."
+    },
+    "items": {
+      "type": "component",
+      "repeatable": true,
+      "component": "blocks.media-grid-item"
+    }
+  }
+}

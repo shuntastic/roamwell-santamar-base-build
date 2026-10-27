@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_blocks_media_grid_categories",
+  "info": {
+    "displayName": "Media Category",
+    "description": "Filter label for a media grid",
+    "icon": "priceTag"
+  },
+  "options": {},
+  "attributes": {
+    "media_categories": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::media-category.media-category"
+    }
+  }
+}

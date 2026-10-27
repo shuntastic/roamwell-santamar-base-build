@@ -31,6 +31,7 @@ Each page supports:
 - `blocks.image-text`
 - `blocks.feature-grid`
 - `blocks.media-gallery`
+- `blocks.media-grid` (filterable image and video grid with lightbox)
 - `blocks.location-map`
 - `blocks.booking-cta`
 - `blocks.booking-calendar` (paste Hostaway calendar embed)

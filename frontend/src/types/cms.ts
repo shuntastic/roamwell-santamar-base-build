@@ -97,6 +97,38 @@ export type BlocksMediaGallery = {
   slideshow: StrapiSlideshow;
 };
 
+/** Media Categories collection entry linked from a grid filter or item. */
+export type MediaCategoryRef = {
+  id?: number;
+  documentId?: string;
+  categoryname?: string | null;
+};
+
+/** Repeatable category slot on a media grid or media item. */
+export type BlocksMediaGridCategory = {
+  id?: number;
+  media_categories?: MediaCategoryRef[] | MediaCategoryRef | null;
+};
+
+export type BlocksMediaGridItem = {
+  id?: number;
+  media?: StrapiMedia | StrapiMedia[] | null;
+  poster?: StrapiMedia | StrapiMedia[] | null;
+  title?: string | null;
+  caption?: string | null;
+  categories?: BlocksMediaGridCategory[] | BlocksMediaGridCategory | null;
+};
+
+export type BlocksMediaGrid = {
+  __component: 'blocks.media-grid';
+  id: number;
+  title?: string | null;
+  maxColumns?: number | null;
+  showItemTitles?: boolean | null;
+  categories?: BlocksMediaGridCategory[] | BlocksMediaGridCategory | null;
+  items?: BlocksMediaGridItem[] | null;
+};
+
 export type BlocksLocationMap = {
   __component: 'blocks.location-map';
   id: number;
@@ -170,6 +202,7 @@ export type PageSection =
   | BlocksImageText
   | BlocksFeatureGrid
   | BlocksMediaGallery
+  | BlocksMediaGrid
   | BlocksLocationMap
   | BlocksBookingCta
   | BlocksBookingCalendar

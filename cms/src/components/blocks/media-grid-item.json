@@ -1,0 +1,38 @@
+{
+  "collectionName": "components_blocks_media_grid_items",
+  "info": {
+    "displayName": "Media Item",
+    "description": "Image or video in a media grid, with an optional lightbox title and caption",
+    "icon": "picture"
+  },
+  "options": {},
+  "attributes": {
+    "media": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images", "videos"],
+      "description": "Image or video for this tile."
+    },
+    "poster": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": ["images"],
+      "description": "Thumbnail for a video tile. If empty, the video’s first frame is used."
+    },
+    "title": {
+      "type": "string",
+      "description": "Optional. Shown under the tile when titles are enabled, and along the bottom of the lightbox."
+    },
+    "caption": {
+      "type": "text",
+      "description": "Optional. Shown with the title along the bottom of the lightbox."
+    },
+    "categories": {
+      "type": "component",
+      "repeatable": true,
+      "component": "blocks.media-grid-category",
+      "description": "Add one entry per tag. Use the same label as a category on this Media Grid."
+    }
+  }
+}

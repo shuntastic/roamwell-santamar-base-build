@@ -63,6 +63,7 @@
         "blocks.image-text",
         "blocks.feature-grid",
         "blocks.media-gallery",
+        "blocks.media-grid",
         "blocks.location-map",
         "blocks.booking-cta",
         "blocks.booking-calendar",

@@ -164,6 +164,63 @@ export interface BlocksMediaGallery extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksMediaGrid extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_media_grids';
+  info: {
+    description: 'Filterable grid of images and videos. A tile opens a lightbox with previous and next controls.';
+    displayName: 'Media Grid';
+    icon: 'apps';
+  };
+  attributes: {
+    categories: Schema.Attribute.Component<'blocks.media-grid-category', true>;
+    items: Schema.Attribute.Component<'blocks.media-grid-item', true>;
+    maxColumns: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 6;
+          min: 1;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<3>;
+    showItemTitles: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    title: Schema.Attribute.String;
+  };
+}
+
+export interface BlocksMediaGridCategory extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_media_grid_categories';
+  info: {
+    description: 'Filter label for a media grid';
+    displayName: 'Media Category';
+    icon: 'priceTag';
+  };
+  attributes: {
+    media_categories: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::media-category.media-category'
+    >;
+  };
+}
+
+export interface BlocksMediaGridItem extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_media_grid_items';
+  info: {
+    description: 'Image or video in a media grid, with an optional lightbox title and caption';
+    displayName: 'Media Item';
+    icon: 'picture';
+  };
+  attributes: {
+    caption: Schema.Attribute.Text;
+    categories: Schema.Attribute.Component<'blocks.media-grid-category', true>;
+    media: Schema.Attribute.Media<'images' | 'videos'> &
+      Schema.Attribute.Required;
+    poster: Schema.Attribute.Media<'images'>;
+    title: Schema.Attribute.String;
+  };
+}
+
 export interface BlocksModalButton extends Struct.ComponentSchema {
   collectionName: 'components_blocks_modal_buttons';
   info: {
@@ -330,6 +387,9 @@ declare module '@strapi/strapi' {
       'blocks.image-text': BlocksImageText;
       'blocks.location-map': BlocksLocationMap;
       'blocks.media-gallery': BlocksMediaGallery;
+      'blocks.media-grid': BlocksMediaGrid;
+      'blocks.media-grid-category': BlocksMediaGridCategory;
+      'blocks.media-grid-item': BlocksMediaGridItem;
       'blocks.modal-button': BlocksModalButton;
       'blocks.rich-text': BlocksRichText;
       'blocks.statement': BlocksStatement;
