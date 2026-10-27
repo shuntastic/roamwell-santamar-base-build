@@ -79,12 +79,13 @@ Header links to locale-prefixed paths (`/en/accommodations`). Nav items: `target
 
 ### `single_page`
 
-Only the **home** page is served. Extra slugs 404.
+The frontend renders **one scrolling view**. Each published page is a section. Header links scroll to those sections with a GSAP ease (`power3.inOut`); the active item follows scroll position.
 
-1. Put the full scroll narrative in the home page **sections** (order matters).
-2. In Navigation, set items to `targetType: section` and a **sectionAnchor**.
-3. Section anchors map to page sections **in the same order** as section-type nav items.
-4. Header links become `/en#stay` with smooth scroll; active state uses `IntersectionObserver`.
+1. Create a page per destination (home, gallery, contact, …) and relate it on the nav item.
+2. Set `targetType: section` and a **sectionAnchor**. That anchor is the section `id`.
+3. Section order follows navigation order (`order`, then the list order when values tie). Home leads when it is not itself a nav item.
+4. Header links are `/en#gallery`. A direct visit to `/en/gallery` redirects to that hash.
+5. A starter that only puts blocks on the home page, with section anchors and no page relations, still maps those anchors onto the home blocks in nav order.
 
 Provision’s `single_page` starter includes hero / stay / location / book / contact sections and matching section nav.
 

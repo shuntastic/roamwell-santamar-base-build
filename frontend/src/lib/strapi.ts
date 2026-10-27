@@ -310,6 +310,38 @@ export async function getPageBySlug(
   }
 }
 
+/** Published pages for a site, including dynamic-zone sections. */
+export async function getPagesWithContent(locale: Locale, siteKey: string): Promise<CmsPage[]> {
+  const pageSize = 50;
+  const pages: CmsPage[] = [];
+
+  try {
+    let page = 1;
+    let pageCount = 1;
+
+    do {
+      const result = await strapiFetch<
+        StrapiListResponse<CmsPage> & { meta?: { pagination?: { pageCount?: number } } }
+      >('/pages', {
+        locale,
+        status: 'published',
+        filters: siteKeyFilter(siteKey),
+        populate: PAGE_POPULATE,
+        pagination: { page, pageSize },
+      });
+
+      pages.push(...(result.data ?? []));
+      pageCount = result.meta?.pagination?.pageCount ?? 1;
+      page += 1;
+    } while (page <= pageCount);
+
+    return pages;
+  } catch (error) {
+    logStrapiFailure(`getPagesWithContent(${locale}, ${siteKey})`, error);
+    return [];
+  }
+}
+
 export async function getAllPages(locale: Locale, siteKey: string): Promise<CmsPage[]> {
   try {
     const result = await strapiFetch<StrapiListResponse<CmsPage>>('/pages', {

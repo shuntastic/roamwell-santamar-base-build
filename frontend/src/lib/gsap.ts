@@ -55,6 +55,78 @@ export function fadeUpStagger(
   );
 }
 
+let activeScrollTween: gsap.core.Tween | null = null;
+let detachScrollCancel: (() => void) | null = null;
+
+/**
+ * Scroll the window to an element or a y position.
+ * `power3.inOut` eases in and out; reduced-motion users jump immediately.
+ * `offsetY` clears a sticky header. A wheel or touch gesture cancels the tween.
+ */
+export function scrollToTarget(
+  target: HTMLElement | number,
+  options?: { offsetY?: number; duration?: number },
+) {
+  registerGsapPlugins();
+  const reduce =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const offsetY = options?.offsetY ?? 0;
+  const max = Math.max(
+    0,
+    document.documentElement.scrollHeight - window.innerHeight,
+  );
+  const raw =
+    typeof target === 'number'
+      ? target
+      : target.getBoundingClientRect().top + window.scrollY - offsetY;
+  const dest = Math.min(Math.max(0, raw), max);
+
+  detachScrollCancel?.();
+  detachScrollCancel = null;
+  activeScrollTween?.kill();
+  activeScrollTween = null;
+
+  const proxy = { y: window.scrollY };
+  let tween: gsap.core.Tween;
+
+  const cleanup = () => {
+    window.removeEventListener('wheel', cancelUserScroll);
+    window.removeEventListener('touchmove', cancelUserScroll);
+    if (detachScrollCancel === cleanup) detachScrollCancel = null;
+  };
+
+  const cancelUserScroll = () => {
+    if (activeScrollTween !== tween) return;
+    cleanup();
+    tween.kill();
+    activeScrollTween = null;
+    ScrollTrigger.update();
+  };
+
+  tween = gsap.to(proxy, {
+    y: dest,
+    duration: reduce ? 0 : (options?.duration ?? 1.15),
+    ease: 'power3.inOut',
+    onUpdate: () => {
+      window.scrollTo(0, proxy.y);
+    },
+    onComplete: () => {
+      cleanup();
+      if (activeScrollTween === tween) activeScrollTween = null;
+      ScrollTrigger.update();
+    },
+  });
+
+  activeScrollTween = tween;
+  detachScrollCancel = cleanup;
+  if (!reduce) {
+    window.addEventListener('wheel', cancelUserScroll, { passive: true });
+    window.addEventListener('touchmove', cancelUserScroll, { passive: true });
+  }
+  return tween;
+}
+
 export function revealOnScroll(selector: string, trigger?: Element | string) {
   registerGsapPlugins();
   return gsap.utils.toArray<HTMLElement>(selector).map((element) =>
