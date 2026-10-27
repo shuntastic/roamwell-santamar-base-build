@@ -41,7 +41,7 @@ function SectionShell({
     <Box
       id={id}
       component="section"
-      sx={{ scrollMarginTop: { xs: 72, md: 88 } }}
+      sx={{ minHeight: '100vh', scrollMarginTop: { xs: 72, md: 88 } }}
     >
       {children}
     </Box>

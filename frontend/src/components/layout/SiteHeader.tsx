@@ -23,7 +23,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { NavItem, SiteTemplate, StrapiMedia } from '@/types/cms';
 import { SiteLogoMark } from '@/components/layout/SiteLogoMark';
+import { scrollToTarget } from '@/lib/gsap';
 import { localeLabels, localeNames, locales, type Locale } from '@/lib/i18n';
+import { sectionAnchorForNavItem, sortNavItems } from '@/lib/singlePage';
 
 /** MUI `md` — 900px. Nav collapses to a hamburger below this width. */
 const NAV_BREAKPOINT = 'md' as const;
@@ -44,21 +46,54 @@ function localizeHref(locale: Locale, url: string) {
 }
 
 function navHref(locale: Locale, item: NavItem, template: SiteTemplate): string {
-  const targetType = item.targetType || (template === 'single_page' && item.sectionAnchor ? 'section' : 'page');
-  if (targetType === 'section' && item.sectionAnchor) {
-    return `/${locale}#${item.sectionAnchor}`;
+  if (template === 'single_page') {
+    const anchor = sectionAnchorForNavItem(item);
+    if (anchor) return `/${locale}#${anchor}`;
   }
   return localizeHref(locale, item.url || '/');
 }
 
-function scrollToAnchor(anchor: string) {
+function readHash(): string | null {
+  if (typeof window === 'undefined') return null;
+  const raw = window.location.hash.replace(/^#/, '');
+  if (!raw) return null;
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
+function writeHash(anchor: string | null) {
+  const base = `${window.location.pathname}${window.location.search}`;
+  window.history.replaceState(null, '', anchor ? `${base}#${anchor}` : base);
+}
+
+function stickyHeaderOffset(fallback: number) {
+  const header = document.querySelector('header');
+  if (!header) return fallback;
+  return Math.ceil(header.getBoundingClientRect().height);
+}
+
+/** GSAP scroll. The first screen (home) goes to the top so the hero stays flush. */
+function scrollToAnchor(anchor: string | null, offsetY: number) {
+  const offset = stickyHeaderOffset(offsetY);
+  if (!anchor) {
+    scrollToTarget(0);
+    writeHash(null);
+    return;
+  }
+
   const el = document.getElementById(anchor);
   if (!el) return;
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  if (typeof window !== 'undefined') {
-    const url = `${window.location.pathname}${window.location.search}#${anchor}`;
-    window.history.replaceState(null, '', url);
+
+  const top = el.getBoundingClientRect().top + window.scrollY;
+  if (top <= offset + 4) {
+    scrollToTarget(0);
+  } else {
+    scrollToTarget(el, { offsetY: offset });
   }
+  writeHash(anchor);
 }
 
 function LocaleSelect({
@@ -198,18 +233,14 @@ export function SiteHeader({
 }: Props) {
   const theme = useTheme();
   const pathname = usePathname();
-  const sorted = [...items].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  const sorted = sortNavItems(items);
   const sectionAnchorKey = sorted
-    .map((item) => item.sectionAnchor)
+    .map((item) => (template === 'single_page' ? sectionAnchorForNavItem(item) : null))
     .filter(Boolean)
     .join('|');
   const { headerStyle, headerHeight, contentMaxWidth, navGap } = theme.layout;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [activeAnchor, setActiveAnchor] = React.useState<string | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const hash = window.location.hash.replace(/^#/, '');
-    return hash || null;
-  });
+  const [activeAnchor, setActiveAnchor] = React.useState<string | null>(() => readHash());
   const isSinglePage = template === 'single_page';
 
   React.useEffect(() => {
@@ -218,36 +249,105 @@ export function SiteHeader({
     const anchors = sectionAnchorKey.split('|').filter(Boolean);
     if (!anchors.length) return;
 
-    const elements = anchors
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => Boolean(el));
+    const line = headerHeight + 24;
+    let frame = 0;
+    let scrollSpyAttached = false;
 
-    if (!elements.length) return;
+    const sectionElements = () =>
+      anchors
+        .map((id) => document.getElementById(id))
+        .filter((el): el is HTMLElement => Boolean(el));
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]?.target?.id) {
-          setActiveAnchor(visible[0].target.id);
+    const pickActive = () => {
+      frame = 0;
+      const elements = sectionElements();
+      let current: string | null = null;
+      for (const el of elements) {
+        if (el.getBoundingClientRect().top <= line) current = el.id;
+      }
+      setActiveAnchor(current);
+    };
+
+    const onScroll = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(pickActive);
+    };
+
+    const attachScrollSpy = () => {
+      if (scrollSpyAttached || !sectionElements().length) return;
+      scrollSpyAttached = true;
+      pickActive();
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+    };
+
+    // Capture phase runs before the browser follows the hash, so the jump
+    // can be replaced with an eased GSAP scroll. Attached immediately — the
+    // page sections may still be streaming in when the header hydrates.
+    const onAnchorClick = (event: MouseEvent) => {
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
+        return;
+      }
+
+      const link = (event.target as Element | null)?.closest?.('a');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (!href || href.startsWith('http')) return;
+
+      let url: URL;
+      try {
+        url = new URL(href, window.location.origin);
+      } catch {
+        return;
+      }
+
+      if (url.pathname !== window.location.pathname) return;
+
+      let anchor = '';
+      if (url.hash) {
+        try {
+          anchor = decodeURIComponent(url.hash.slice(1));
+        } catch {
+          anchor = url.hash.slice(1);
         }
-      },
-      {
-        rootMargin: '-20% 0px -55% 0px',
-        threshold: [0.1, 0.25, 0.5],
-      },
-    );
+      }
+      if (anchor) {
+        if (!anchors.includes(anchor) || !document.getElementById(anchor)) return;
+        event.preventDefault();
+        event.stopPropagation();
+        scrollToAnchor(anchor, headerHeight);
+        return;
+      }
 
-    elements.forEach((el) => observer.observe(el));
+      if (link.closest('header')) {
+        event.preventDefault();
+        event.stopPropagation();
+        scrollToAnchor(null, headerHeight);
+      }
+    };
 
-    const hash = window.location.hash.replace(/^#/, '');
+    document.addEventListener('click', onAnchorClick, true);
+    attachScrollSpy();
+
+    const hash = readHash();
     if (hash && anchors.includes(hash)) {
-      requestAnimationFrame(() => scrollToAnchor(hash));
+      requestAnimationFrame(() => scrollToAnchor(hash, headerHeight));
     }
 
-    return () => observer.disconnect();
-  }, [isSinglePage, sectionAnchorKey]);
+    return () => {
+      document.removeEventListener('click', onAnchorClick, true);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, [isSinglePage, sectionAnchorKey, headerHeight]);
 
   const headerSx =
     headerStyle === 'solid'
@@ -265,8 +365,8 @@ export function SiteHeader({
             boxShadow: 'none',
           }
         : {
-            bgcolor: 'rgba(247, 251, 252, 1.0)',
-            color: 'text.primary',
+              bgcolor: 'rgba(247, 251, 252, 1.0)',
+              color: 'text.primary',
             backdropFilter: 'blur(12px)',
             borderBottom: '1px solid',
             borderColor: 'divider',
@@ -278,20 +378,18 @@ export function SiteHeader({
 
   const renderNavButton = (item: NavItem, opts?: { mobile?: boolean }) => {
     const href = navHref(locale, item, template);
-    const targetType =
-      item.targetType || (isSinglePage && item.sectionAnchor ? 'section' : 'page');
-    const isSection = targetType === 'section' && Boolean(item.sectionAnchor);
+    const anchor = isSinglePage ? sectionAnchorForNavItem(item) : null;
+    const isSection = Boolean(anchor);
     const pathActive =
       !isSection &&
       (pathname === href || (item.url !== '/' && item.url && pathname.startsWith(localizeHref(locale, item.url))));
-    const sectionActive = isSection && activeAnchor === item.sectionAnchor;
+    const sectionActive = isSection && activeAnchor === anchor;
     const active = isSection ? sectionActive : pathActive;
 
     const onClick = (event: React.MouseEvent) => {
-      if (isSection && item.sectionAnchor) {
+      if (isSection && anchor) {
         event.preventDefault();
-        scrollToAnchor(item.sectionAnchor);
-        setActiveAnchor(item.sectionAnchor);
+        scrollToAnchor(anchor, headerHeight);
       }
       if (opts?.mobile) closeMobile();
     };
@@ -299,7 +397,7 @@ export function SiteHeader({
     if (opts?.mobile) {
       return (
         <ListItemButton
-          key={`${item.label}-${item.sectionAnchor || item.url}`}
+          key={`${item.label}-${anchor || item.url}`}
           component={Link}
           href={href}
           selected={Boolean(active)}
@@ -326,7 +424,7 @@ export function SiteHeader({
 
     return (
       <Button
-        key={`${item.label}-${item.sectionAnchor || item.url}`}
+        key={`${item.label}-${anchor || item.url}`}
         component={Link}
         href={href}
         onClick={onClick}
@@ -362,9 +460,7 @@ export function SiteHeader({
               onClick={(event) => {
                 if (isSinglePage) {
                   event.preventDefault();
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  window.history.replaceState(null, '', homeHref);
-                  setActiveAnchor(null);
+                  scrollToAnchor(null, headerHeight);
                 }
               }}
               sx={{
@@ -387,9 +483,7 @@ export function SiteHeader({
               onClick={(event) => {
                 if (isSinglePage) {
                   event.preventDefault();
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                  window.history.replaceState(null, '', homeHref);
-                  setActiveAnchor(null);
+                  scrollToAnchor(null, headerHeight);
                 }
               }}
               sx={{

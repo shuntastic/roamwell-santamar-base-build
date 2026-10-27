@@ -14,24 +14,30 @@ type Props = {
   locale: string;
   /** Ordered section anchors for single_page hash navigation. */
   sectionAnchors?: string[] | null;
+  /** Rendered inside a parent page section (single_page stack). */
+  embedded?: boolean;
 };
 
-export function PageView({ page, locale, sectionAnchors }: Props) {
+export function PageView({ page, locale, sectionAnchors, embedded = false }: Props) {
   const hasHero = page.sections?.some((section) => section.__component === 'blocks.hero');
+  // In the single-page stack, blocks already carry their own headings.
+  // Repeat the page title only when a page has no sections yet.
+  const showPageTitle = !hasHero && (!embedded || !page.sections?.length);
 
   return (
-    <Box component="article">
+    <Box component={embedded ? 'div' : 'article'}>
       <DynamicSections
         sections={page.sections}
         locale={locale}
         sectionAnchors={sectionAnchors}
       />
 
-      {!hasHero ? (
+      {showPageTitle ? (
         <SectionReveal>
           <ThemeSection narrow sx={{ pb: 2 }}>
             <Typography
               variant="h1"
+              component={embedded ? 'h2' : 'h1'}
               sx={{ fontSize: { xs: '2.6rem', md: '3.8rem' }, color: 'primary.main', mb: 3 }}
             >
               {page.title}

@@ -248,6 +248,15 @@ export type Site = {
   defaultSeo?: StrapiSeo | null;
 };
 
+/** Page relation populated on a nav item (identity only — not the full page body). */
+export type NavItemPage = {
+  id?: number;
+  documentId?: string;
+  title?: string;
+  slug?: string;
+  navLabel?: string | null;
+};
+
 export type NavItem = {
   id?: number;
   label: string;
@@ -255,6 +264,7 @@ export type NavItem = {
   order?: number;
   targetType?: 'page' | 'section' | null;
   sectionAnchor?: string | null;
+  page?: NavItemPage | null;
 };
 
 export type Navigation = {

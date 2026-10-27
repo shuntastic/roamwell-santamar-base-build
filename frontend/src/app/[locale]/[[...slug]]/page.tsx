@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { PageView } from '@/components/blocks/PageView';
+import { SinglePageView } from '@/components/blocks/SinglePageView';
 import { isLocale, locales, type Locale } from '@/lib/i18n';
-import { getAllPages, getNavigation, getPageBySlug, getSiteByHost } from '@/lib/strapi';
+import { getAllPages, getNavigation, getPageBySlug, getPagesWithContent, getSiteByHost } from '@/lib/strapi';
+import { anchorForPageSlug, composeSinglePage } from '@/lib/singlePage';
 import { getRequestSiteHost, getStaticSiteKey } from '@/lib/siteHost';
 import { getFallbackPage } from '@/lib/fallbackContent';
 
@@ -75,28 +77,35 @@ export default async function CmsPageRoute({ params }: Props) {
   const site = await getSiteByHost(host, locale);
   const path = slug?.join('/') || 'home';
 
-  // single_page sites only expose the home (landing) document
-  if (site?.template === 'single_page' && path !== 'home') {
-    notFound();
+  if (site?.template === 'single_page') {
+    const navigation = await getNavigation(locale, siteKey);
+
+    // Deep links to a former page route land on that section in the single view.
+    if (path !== 'home') {
+      const anchor = anchorForPageSlug(path, navigation?.items);
+      redirect(anchor ? `/${locale}#${anchor}` : `/${locale}`);
+    }
+
+    const pages = await getPagesWithContent(locale, siteKey);
+    const composition = composeSinglePage(pages, navigation?.items);
+
+    if (composition?.mode === 'pages') {
+      return <SinglePageView sections={composition.sections} locale={locale} />;
+    }
+
+    if (composition?.mode === 'blocks') {
+      return (
+        <PageView
+          page={composition.page}
+          locale={locale}
+          sectionAnchors={composition.anchors}
+        />
+      );
+    }
   }
 
   const page = (await getPageBySlug(path, locale, siteKey)) ?? getFallbackPage(path, locale);
   if (!page) notFound();
 
-  const navigation = await getNavigation(locale, siteKey);
-  const sectionAnchors =
-    site?.template === 'single_page'
-      ? (navigation?.items ?? [])
-          .filter((item) => (item.targetType || 'page') === 'section' && item.sectionAnchor)
-          .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-          .map((item) => item.sectionAnchor as string)
-      : undefined;
-
-  return (
-    <PageView
-      page={page}
-      locale={locale}
-      sectionAnchors={sectionAnchors}
-    />
-  );
+  return <PageView page={page} locale={locale} />;
 }
