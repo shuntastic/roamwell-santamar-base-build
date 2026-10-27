@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { alpha } from '@mui/material/styles';
-import type { StrapiSlideshow } from '@/types/cms';
-import { getStrapiMediaUrl } from '@/lib/strapi';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import { alpha } from "@mui/material/styles";
+import type { StrapiSlideshow } from "@/types/cms";
+import { getStrapiMediaUrl } from "@/lib/strapi";
 
 type Props = {
   slideshow: StrapiSlideshow;
@@ -34,41 +34,48 @@ export function Slideshow({ slideshow, transitionMs = 1000 }: Props) {
 
   if (!slides.length || !active?.media) return null;
 
-  const goPrev = () => setIndex((current) => (current - 1 + slides.length) % slides.length);
+  const goPrev = () =>
+    setIndex((current) => (current - 1 + slides.length) % slides.length);
   const goNext = () => setIndex((current) => (current + 1) % slides.length);
 
   return (
     <Box
       component="section"
       aria-roledescription="carousel"
-      aria-label={slideshow.title || 'Slideshow'}
+      aria-label={slideshow.title || "Slideshow"}
       sx={{
-        position: 'relative',
-        overflow: 'hidden',
-        bgcolor: 'primary.dark',
-        color: 'common.white',
-        width: '100%',
+        position: "relative",
+        overflow: "hidden",
+        bgcolor: "primary.dark",
+        color: "common.white",
+        width: "100%",
         maxWidth: 1200,
-        height: '80vh',
+        height: "80vh",
         maxHeight: 840,
-        mx: 'auto',
+        mx: "auto",
       }}
     >
       {slideshow.title ? (
         <Typography
           variant="overline"
-          sx={{ position: 'absolute', top: 16, left: 20, zIndex: 2, opacity: 0.85 }}
+          sx={{
+            position: "absolute",
+            top: 16,
+            left: 20,
+            zIndex: 2,
+            opacity: 0.85,
+          }}
         >
           {slideshow.title}
         </Typography>
       ) : null}
 
-      <Box sx={{ position: 'absolute', inset: 0 }}>
+      <Box sx={{ position: "absolute", inset: 0 }}>
         {slides.map((slide, slideIndex) => {
           if (!slide.media) return null;
           const mediaUrl = getStrapiMediaUrl(slide.media.url);
           if (!mediaUrl) return null;
-          const isVideo = slide.media.mime?.startsWith('video/');
+          const isVideo = slide.media.mime?.startsWith("video/");
           const activeSlide = slideIndex === safeIndex;
 
           return (
@@ -76,11 +83,11 @@ export function Slideshow({ slideshow, transitionMs = 1000 }: Props) {
               key={`${slide.id ?? mediaUrl}-${slideIndex}`}
               aria-hidden={!activeSlide}
               sx={{
-                position: 'absolute',
+                position: "absolute",
                 inset: 0,
                 opacity: activeSlide ? 1 : 0,
-                transition: isCarousel ? `opacity ${fadeMs}ms ease` : 'none',
-                pointerEvents: activeSlide ? 'auto' : 'none',
+                transition: isCarousel ? `opacity ${fadeMs}ms ease` : "none",
+                pointerEvents: activeSlide ? "auto" : "none",
               }}
             >
               {isVideo ? (
@@ -91,14 +98,19 @@ export function Slideshow({ slideshow, transitionMs = 1000 }: Props) {
                   muted
                   loop
                   playsInline
-                  sx={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                  sx={{ width: "100%", height: "100%", objectFit: "contain" }}
                 />
               ) : (
                 <Box
                   component="img"
                   src={mediaUrl}
-                  alt={slide.altText || slide.caption || slideshow.title || ''}
-                  sx={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }}
+                  alt={slide.altText || slide.caption || slideshow.title || ""}
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "contain",
+                    display: "block",
+                  }}
                 />
               )}
             </Box>
@@ -106,32 +118,41 @@ export function Slideshow({ slideshow, transitionMs = 1000 }: Props) {
         })}
         <Box
           sx={{
-            position: 'absolute',
+            position: "absolute",
             inset: 0,
             zIndex: 1,
-            pointerEvents: 'none',
+            pointerEvents: "none",
           }}
         />
       </Box>
 
       {active.caption ? (
-        <Typography
-          variant="body1"
+        <Box
           sx={{
-            position: 'absolute',
-            left: { xs: 56, md: 72 },
-            right: { xs: 56, md: 72 },
-            bottom: { xs: 24, md: 36 },
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
             zIndex: 2,
-            maxWidth: 640,
-            fontFamily: 'var(--font-display), "Times New Roman", serif',
-            fontSize: { xs: '1.15rem', md: '1.5rem' },
-            opacity: 1,
-            transition: isCarousel ? `opacity ${fadeMs}ms ease` : 'none',
+            p: 3.0,
+            background: `linear-gradient(41deg, #00000030 0%, #00000075 32%, #00000000 77%)`,
           }}
         >
-          {active.caption}
-        </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              position: "relative",
+              maxWidth: 640,
+              fontFamily: 'var(--font-body),"Helvetica Neue",Arial,sans-serif',
+              lineHeight: "1.25rem",
+              fontSize: "1.125rem",
+              opacity: 1,
+              transition: isCarousel ? `opacity ${fadeMs}ms ease` : "none",
+            }}
+          >
+            {active.caption}
+          </Typography>
+        </Box>
       ) : null}
 
       {isCarousel ? (
@@ -140,14 +161,14 @@ export function Slideshow({ slideshow, transitionMs = 1000 }: Props) {
             aria-label="Previous slide"
             onClick={goPrev}
             sx={(theme) => ({
-              position: 'absolute',
+              position: "absolute",
               left: 8,
-              top: '50%',
-              transform: 'translateY(-50%)',
+              top: "50%",
+              transform: "translateY(-50%)",
               zIndex: 2,
-              color: 'common.white',
+              color: "common.white",
               bgcolor: alpha(theme.palette.secondary.main, 1.0),
-              '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.78) },
+              "&:hover": { bgcolor: alpha(theme.palette.secondary.main, 0.78) },
             })}
           >
             <ChevronLeftIcon />
@@ -156,14 +177,14 @@ export function Slideshow({ slideshow, transitionMs = 1000 }: Props) {
             aria-label="Next slide"
             onClick={goNext}
             sx={(theme) => ({
-              position: 'absolute',
+              position: "absolute",
               right: 8,
-              top: '50%',
-              transform: 'translateY(-50%)',
+              top: "50%",
+              transform: "translateY(-50%)",
               zIndex: 2,
-              color: 'common.white',
+              color: "common.white",
               bgcolor: alpha(theme.palette.secondary.main, 1.0),
-              '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.78) },
+              "&:hover": { bgcolor: alpha(theme.palette.secondary.main, 0.78) },
             })}
           >
             <ChevronRightIcon />
