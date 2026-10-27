@@ -13,6 +13,7 @@
     "build:cms": "npm run build --prefix cms",
     "build:web": "npm run build --prefix frontend",
     "build:web:static": "npm run build:static --prefix frontend",
+    "build:web:static:local": "bash deploy/lamp-static/build-local.sh",
     "start:cms": "npm run start --prefix cms",
     "start:web": "npm run start --prefix frontend",
     "storybook": "npm run storybook --prefix frontend",

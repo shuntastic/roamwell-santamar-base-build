@@ -1,8 +1,51 @@
 # Static frontend on classic LAMP (Apache DocumentRoot)
 
-Use this when you want the **public site as static HTML** on Apache (no Node for the frontend), while Strapi continues to run on Node (same host or `cms.` subdomain).
+Use this when you want the **public site as static HTML** on Apache (no Node for the frontend).
+
+Two builds:
+
+| Command | Content source | What the LAMP host needs |
+| --- | --- | --- |
+| `npm run build:web:static:local` | Laptop Strapi (`cms/.tmp/data.db` + `cms/public/uploads`) | DocumentRoot only. Media is copied into `out/uploads`. |
+| `npm run build:web:static` | Public CMS URL (`deploy/digitalocean/frontend.env` or `NEXT_PUBLIC_STRAPI_URL`) | DocumentRoot, plus a reachable Strapi for `/uploads` (and any live API calls). |
+
+The remote-CMS path is documented below. The local-CMS path is the next section.
 
 > The default production path remains **Node `next start`** (ISR + middleware). See [DEPLOY-LAMP.md](DEPLOY-LAMP.md) for reverse-proxy mode.
+
+## Local CMS → static DocumentRoot
+
+Use this when the content you want on the LAMP host is the **local** Strapi build (SQLite at `cms/.tmp/data.db` and files in `cms/public/uploads`), not the DigitalOcean droplet.
+
+```bash
+# From the repo root. Starts the local CMS if it is not already on :1337.
+npm run build:web:static:local
+```
+
+What it does:
+
+1. Uses Strapi at `http://127.0.0.1:1337` if it is already running (`npm run dev` or `npm start`). If nothing is listening, it runs `npm run build` in `cms/` and `npm start`, then stops that process when the export finishes.
+2. Static-exports the frontend against that API (`LAMP_CMS=local`), and does **not** load `deploy/digitalocean/frontend.env`.
+3. Copies `cms/public/uploads` to `frontend/out/uploads`.
+4. Rewrites baked `http://127.0.0.1:1337` media URLs to same-origin `/uploads/…`.
+
+Upload the contents of `frontend/out/` to the Apache DocumentRoot (same vhost as the next section). After CMS edits, run the command again and re-upload `out/`.
+
+Pin a site other than the primary (localhost resolves to the primary site):
+
+```bash
+SITE_KEY=santamar npm run build:web:static:local
+# or
+LAMP_SITE_HOSTNAME=www.example.com npm run build:web:static:local
+```
+
+`SITE_HOSTNAME` inherited from a DigitalOcean `frontend.env` is ignored so the local database is not queried for the droplet host.
+
+---
+
+## Remote CMS → static DocumentRoot
+
+Use this when the live site should keep calling a public Strapi (droplet or `cms.` subdomain) for media. `npm run build:web:static` loads `deploy/digitalocean/frontend.env` when `NEXT_PUBLIC_STRAPI_URL` is not already exported.
 
 ```
 Internet
@@ -119,7 +162,8 @@ NEXT_PUBLIC_STRAPI_URL=https://cms.example.com npm run build:web:static
 
 | Path | Role |
 | --- | --- |
-| `frontend/scripts/build-static.cjs` | Static export orchestrator |
+| `frontend/scripts/build-static.cjs` | Static export orchestrator (`LAMP_CMS=local` vendors uploads) |
+| `deploy/lamp-static/build-local.sh` | `npm run build:web:static:local` — local CMS → `frontend/out/` |
 | `deploy/lamp-static/frontend.htaccess` | Copied to `out/.htaccess` |
 | `deploy/lamp-static/cms-cors.htaccess` | CMS subdomain CORS fragment |
 | `deploy/lamp-static/api-proxy.php` | Optional www→cms API proxy |

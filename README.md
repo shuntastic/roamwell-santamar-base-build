@@ -124,14 +124,23 @@ Club GreenSock package is committed as root `gsap-bonus.tgz` and installed into 
 | **DigitalOcean (CMS only)** | **[docs/DEPLOY-DIGITALOCEAN.md](docs/DEPLOY-DIGITALOCEAN.md)** — `./deploy/digitalocean/deploy.sh` + FTP frontend |
 | **AWS Free Tier (EC2)** | **[docs/DEPLOY-AWS.md](DEPLOY-AWS.md)** — `./deploy/aws/deploy.sh` |
 | **LAMP (Node reverse-proxy)** | **[docs/DEPLOY-LAMP.md](docs/DEPLOY-LAMP.md)** — Apache → PM2 Next + Strapi |
-| **LAMP (static DocumentRoot)** | **[docs/DEPLOY-LAMP-STATIC.md](docs/DEPLOY-LAMP-STATIC.md)** — `npm run build:web:static` → `frontend/out/` |
+| **LAMP (static DocumentRoot)** | **[docs/DEPLOY-LAMP-STATIC.md](docs/DEPLOY-LAMP-STATIC.md)** — `npm run build:web:static` (remote CMS) or `npm run build:web:static:local` (laptop CMS + uploads) → `frontend/out/` |
 
 ### Static frontend on Apache (no Node for the site)
+
+From a **remote** CMS (DigitalOcean `frontend.env` or an explicit URL):
 
 ```bash
 NEXT_PUBLIC_STRAPI_URL=https://cms.example.com npm run build:web:static
 # upload frontend/out/ (includes .htaccess) to the site DocumentRoot
 # set cms/.env FRONTEND_URL / FRONTEND_URLS to the www origin for CORS
+```
+
+From the **local** CMS database and uploads (self-contained DocumentRoot; no live Strapi on the server):
+
+```bash
+npm run build:web:static:local
+# upload frontend/out/ — pages plus /uploads/ from cms/public/uploads
 ```
 
 ### AWS Free Tier (quick start)

@@ -1,5 +1,8 @@
 # Apache config for the *static* Santamar frontend (DocumentRoot = frontend/out).
-# Copied to out/.htaccess by `npm run build:static`.
+# Copied to out/.htaccess by `npm run build:static` and `npm run build:web:static:local`.
+#
+# Local-CMS builds also place media at DocumentRoot/uploads/ (real files).
+# The "keep real files" rule below serves those without rewriting.
 #
 # Requires: AllowOverride All (or FileInfo + Options) for this vhost
 #           a2enmod rewrite headers
