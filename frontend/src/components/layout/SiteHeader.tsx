@@ -240,7 +240,9 @@ export function SiteHeader({
     .join('|');
   const { headerStyle, headerHeight, contentMaxWidth, navGap } = theme.layout;
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [activeAnchor, setActiveAnchor] = React.useState<string | null>(() => readHash());
+  // The URL hash is only available in the browser. Reading it here would mark
+  // a different nav item active than the server HTML and break hydration.
+  const [activeAnchor, setActiveAnchor] = React.useState<string | null>(null);
   const isSinglePage = template === 'single_page';
 
   React.useEffect(() => {
@@ -338,6 +340,7 @@ export function SiteHeader({
 
     const hash = readHash();
     if (hash && anchors.includes(hash)) {
+      setActiveAnchor(hash);
       requestAnimationFrame(() => scrollToAnchor(hash, headerHeight));
     }
 

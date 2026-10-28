@@ -16,6 +16,8 @@ type Props = {
   content?: unknown;
   /** MUI Typography color token. Defaults to text.secondary. */
   color?: string;
+  /** Overrides the default 760px reading measure. */
+  maxWidth?: number | string;
 };
 
 function renderInline(nodes: BlocksNode[] = [], keyPrefix = 'i'): ReactNode[] {
@@ -37,7 +39,7 @@ function renderInline(nodes: BlocksNode[] = [], keyPrefix = 'i'): ReactNode[] {
   });
 }
 
-export function StyledCopy({ content, color = 'text.secondary' }: Props) {
+export function StyledCopy({ content, color = 'text.secondary', maxWidth = 760 }: Props) {
   if (!Array.isArray(content) || content.length === 0) return null;
 
   return (
@@ -48,7 +50,7 @@ export function StyledCopy({ content, color = 'text.secondary' }: Props) {
         '& h2, & h3': { mt: 3, mb: 1.5 },
         '& p:last-child, & ul:last-child, & ol:last-child': { mb: 0 },
         mx: 'auto',
-        maxWidth: 760,
+        maxWidth,
       }}
     >
       {(content as BlocksNode[]).map((block, index) => {

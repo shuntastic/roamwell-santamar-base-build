@@ -292,7 +292,7 @@ const blackbox = buildTheme({
       contrastText: '#c1e1ff',
     },
     secondary: {
-      main: '#c1e1ff',
+      main: '#ffffff',
       light: '#c5d2de',
       dark: '#5d7590',
       contrastText: '#332b1b',
@@ -303,7 +303,7 @@ const blackbox = buildTheme({
     },
     text: {
       primary: '#332b1b',
-      secondary: '#332b1b',
+      secondary: '#ffffff',
     },
     divider: 'rgba(51, 43, 27, 0.16)',
   },

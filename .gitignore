@@ -64,3 +64,4 @@ frontend/gsap-bonus.tgz
 !.yarn/releases
 !.yarn/versions
 deploy/digitalocean/.known_hosts.old
+frontend/.env.puntasur

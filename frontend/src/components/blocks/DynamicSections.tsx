@@ -75,7 +75,10 @@ export function DynamicSections({ sections, locale, sectionAnchors }: Props) {
                         {section.title}
                       </Typography>
                     ) : null}
-                    <StyledCopy content={section.body} />
+                    <StyledCopy
+                      content={section.body}
+                      maxWidth={theme.layout.id === 'blackbox' ? 1200 : undefined}
+                    />
                   </ThemeSection>
                 </SectionReveal>
               </SectionShell>

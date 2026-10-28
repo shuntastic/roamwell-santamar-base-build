@@ -80,7 +80,7 @@ export function HeroBlock({ block, locale }: Props) {
       >
         <HeroMotion>
           {block.eyebrow ? (
-            <Typography variant="overline" sx={{ letterSpacing: '0.18em', opacity: 1.0, fontSize: '0.85rem', textShadow: '0 0 6px rgba(0, 0, 0, 0.5)' }}>
+            <Typography variant="overline" sx={{ color: theme.layout.id === 'blackbox' ? 'text.secondary' : undefined, letterSpacing: '0.18em', opacity: 1.0, fontSize: '0.85rem', textShadow: '0 0 6px rgba(0, 0, 0, 0.5)' }}>
               {block.eyebrow}
             </Typography>
           ) : null}
@@ -100,6 +100,7 @@ export function HeroBlock({ block, locale }: Props) {
                 maxWidth: 520,
                 fontSize: { xs: '1.2rem', md: '1.5rem' },
                 fontWeight: theme.layout.id === 'blackbox' ? 400 : 600,
+                color: theme.layout.id === 'blackbox' ? 'text.secondary' : undefined,
                 opacity: 1.0,
                 letterSpacing: '0.03em',
               }}
