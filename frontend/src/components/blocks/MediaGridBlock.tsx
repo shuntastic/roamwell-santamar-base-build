@@ -63,15 +63,6 @@ function displayLabel(label: string) {
   return label.trim().replace(/\s+/g, ' ');
 }
 
-const ITEM_TITLE_MAX_CHARS = 21;
-
-/** Grid-tile label. Longer titles keep the first 30 characters and end with an ellipsis. */
-function truncateItemTitle(title: string) {
-  const normalized = displayLabel(title);
-  if (normalized.length <= ITEM_TITLE_MAX_CHARS) return normalized;
-  return `${normalized.slice(0, ITEM_TITLE_MAX_CHARS).trimEnd()}…`;
-}
-
 function categoryKey(label: string) {
   return displayLabel(label).toLowerCase();
 }
@@ -693,9 +684,14 @@ export function MediaGridBlock({ block }: Props) {
                         color: 'text.primary',
                         lineHeight: 1.35,
                         display: 'block',
+                        textWrap: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxHeight: '40px',
                       }}
                     >
-                      {truncateItemTitle(item.title)}
+                      {item.title}
                     </Typography>
                   </Box>
                 ) : null}
