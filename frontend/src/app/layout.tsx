@@ -18,8 +18,8 @@ const body = Instrument_Sans({
 
 export const metadata: Metadata = {
   title: {
-    default: 'Santamar',
-    template: '%s | Santamar',
+    default: '',
+    template: '%s',
   },
   description: 'Coastal hospitality with accommodations, local experiences, and easy booking.',
 };
