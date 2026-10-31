@@ -2,7 +2,7 @@
   "collectionName": "components_blocks_statements",
   "info": {
     "displayName": "Statement",
-    "description": "Centered statement text used as a section divider",
+    "description": "Centered statement text used as a section divider, with up to three optional buttons",
     "icon": "quote"
   },
   "options": {},
@@ -13,6 +13,12 @@
     },
     "body": {
       "type": "text"
+    },
+    "buttons": {
+      "type": "component",
+      "component": "shared.cta-button",
+      "repeatable": true,
+      "max": 3
     }
   }
 }

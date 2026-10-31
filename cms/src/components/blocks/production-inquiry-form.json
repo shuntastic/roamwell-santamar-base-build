@@ -1,0 +1,36 @@
+{
+  "collectionName": "components_blocks_production_inquiry_forms",
+  "info": {
+    "displayName": "Production Inquiry Form",
+    "description": "Location / production booking inquiry form. Submissions are emailed to the recipients below and saved under Production Inquiries.",
+    "icon": "file"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "default": "Check Availability"
+    },
+    "intro": {
+      "type": "text",
+      "default": "Have a project in mind? Send us a few production details and we’ll get back to you with availability and a quote. Rates are based on production type, crew size, hours, usage, and location requirements.\n\nScouting visits are available by appointment."
+    },
+    "submitLabel": {
+      "type": "string",
+      "default": "Check Availability"
+    },
+    "successMessage": {
+      "type": "string",
+      "default": "Thank you. Our production team will be in touch shortly."
+    },
+    "recipients": {
+      "type": "component",
+      "private": true,
+      "component": "shared.email-recipient",
+      "repeatable": true,
+      "required": true,
+      "min": 1,
+      "max": 10
+    }
+  }
+}

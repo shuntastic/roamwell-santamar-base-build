@@ -2,7 +2,7 @@
   "collectionName": "components_blocks_rich_texts",
   "info": {
     "displayName": "Rich Text",
-    "description": "Styled copy block for long-form content",
+    "description": "Styled copy block for long-form content, with up to three optional buttons",
     "icon": "write"
   },
   "options": {},
@@ -13,6 +13,12 @@
     "body": {
       "type": "blocks",
       "required": true
+    },
+    "buttons": {
+      "type": "component",
+      "component": "shared.cta-button",
+      "repeatable": true,
+      "max": 3
     }
   }
 }

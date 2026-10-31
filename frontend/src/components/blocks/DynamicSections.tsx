@@ -15,11 +15,14 @@ import { HeroBlock } from '@/components/blocks/HeroBlock';
 import { ImageTextBlock } from '@/components/blocks/ImageTextBlock';
 import { MediaGridBlock } from '@/components/blocks/MediaGridBlock';
 import { ContactFormBlock } from '@/components/blocks/ContactFormBlock';
+import { ProductionInquiryFormBlock } from '@/components/blocks/ProductionInquiryFormBlock';
+import { CtaButtonsBlock } from '@/components/blocks/CtaButtonsBlock';
 import { ModalButtonBlock } from '@/components/blocks/ModalButtonBlock';
 import { EmbedWidgetBlock } from '@/components/blocks/EmbedWidgetBlock';
 import { StatementBlock } from '@/components/blocks/StatementBlock';
 import { SectionReveal } from '@/components/blocks/SectionReveal';
 import { LinkButton } from '@/components/ui/LinkButton';
+import { CtaButtonGroup } from '@/components/ui/CtaButtonGroup';
 import { ThemeSection } from '@/components/layout/ThemeSection';
 
 type Props = {
@@ -79,6 +82,16 @@ export function DynamicSections({ sections, locale, sectionAnchors }: Props) {
                       content={section.body}
                       maxWidth={theme.layout.id === 'blackbox' ? 1200 : undefined}
                     />
+                    <CtaButtonGroup
+                      buttons={section.buttons}
+                      locale={locale}
+                      align="start"
+                      sx={{
+                        mt: { xs: 3.5, md: 4 },
+                        mx: 'auto',
+                        maxWidth: theme.layout.id === 'blackbox' ? 1200 : 760,
+                      }}
+                    />
                   </ThemeSection>
                 </SectionReveal>
               </SectionShell>
@@ -88,7 +101,7 @@ export function DynamicSections({ sections, locale, sectionAnchors }: Props) {
             return (
               <SectionShell key={`${section.__component}-${section.id}`} id={anchorId}>
                 <SectionReveal>
-                  <StatementBlock block={section} />
+                  <StatementBlock block={section} locale={locale} />
                 </SectionReveal>
               </SectionShell>
             );
@@ -309,6 +322,24 @@ export function DynamicSections({ sections, locale, sectionAnchors }: Props) {
               <SectionShell key={`${section.__component}-${section.id}`} id={anchorId}>
                 <SectionReveal>
                   <ContactFormBlock block={section} />
+                </SectionReveal>
+              </SectionShell>
+            );
+
+          case 'blocks.production-inquiry-form':
+            return (
+              <SectionShell key={`${section.__component}-${section.id}`} id={anchorId}>
+                <SectionReveal>
+                  <ProductionInquiryFormBlock block={section} locale={locale} />
+                </SectionReveal>
+              </SectionShell>
+            );
+
+          case 'blocks.cta-buttons':
+            return (
+              <SectionShell key={`${section.__component}-${section.id}`} id={anchorId}>
+                <SectionReveal>
+                  <CtaButtonsBlock block={section} locale={locale} />
                 </SectionReveal>
               </SectionShell>
             );

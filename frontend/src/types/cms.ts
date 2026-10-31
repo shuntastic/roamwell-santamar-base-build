@@ -54,6 +54,7 @@ export type BlocksRichText = {
   id: number;
   title?: string | null;
   body: unknown;
+  buttons?: StrapiCtaButton[] | null;
 };
 
 export type BlocksStatement = {
@@ -61,6 +62,7 @@ export type BlocksStatement = {
   id: number;
   title: string;
   body?: string | null;
+  buttons?: StrapiCtaButton[] | null;
 };
 
 export type BlocksImageText = {
@@ -175,6 +177,31 @@ export type BlocksContactForm = {
   recipientEmail?: string | null;
 };
 
+/** Recipients are private in the CMS and never reach the browser; `id` identifies the form on submit. */
+export type BlocksProductionInquiryForm = {
+  __component: 'blocks.production-inquiry-form';
+  id: number;
+  title?: string | null;
+  intro?: string | null;
+  submitLabel?: string | null;
+  successMessage?: string | null;
+};
+
+export type StrapiCtaButton = {
+  id?: number;
+  label: string;
+  url: string;
+  openInNewTab?: boolean | null;
+  size?: 'small' | 'medium' | 'large' | null;
+  style?: 'primary' | 'secondary' | 'text' | null;
+};
+
+export type BlocksCtaButtons = {
+  __component: 'blocks.cta-buttons';
+  id: number;
+  buttons?: StrapiCtaButton[] | null;
+};
+
 export type BlocksModalButton = {
   __component: 'blocks.modal-button';
   id: number;
@@ -208,6 +235,8 @@ export type PageSection =
   | BlocksBookingCalendar
   | BlocksBookingSearch
   | BlocksContactForm
+  | BlocksProductionInquiryForm
+  | BlocksCtaButtons
   | BlocksModalButton
   | BlocksVideoEmbed;
 

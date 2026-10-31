@@ -1,0 +1,92 @@
+{
+  "kind": "collectionType",
+  "collectionName": "production_inquiries",
+  "info": {
+    "singularName": "production-inquiry",
+    "pluralName": "production-inquiries",
+    "displayName": "Production Inquiry",
+    "description": "Submissions from the Production Inquiry Form block"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "maxLength": 120
+    },
+    "company": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "email": {
+      "type": "email",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "maxLength": 40
+    },
+    "productionType": {
+      "type": "enumeration",
+      "enum": ["commercial", "editorial", "film_tv", "corporate", "music_video", "other"],
+      "required": true
+    },
+    "productionTypeOther": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "shootDateStart": {
+      "type": "date",
+      "required": true
+    },
+    "shootDateEnd": {
+      "type": "date"
+    },
+    "prepStrikeDateStart": {
+      "type": "date"
+    },
+    "prepStrikeDateEnd": {
+      "type": "date"
+    },
+    "crewSize": {
+      "type": "integer",
+      "min": 1
+    },
+    "hoursNeeded": {
+      "type": "decimal",
+      "min": 0
+    },
+    "format": {
+      "type": "enumeration",
+      "enum": ["still", "motion", "both"]
+    },
+    "projectBrand": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "vehicleCount": {
+      "type": "integer",
+      "min": 0
+    },
+    "details": {
+      "type": "text",
+      "maxLength": 5000
+    },
+    "sourceUrl": {
+      "type": "string"
+    },
+    "submittedLocale": {
+      "type": "string"
+    },
+    "recipients": {
+      "type": "text"
+    },
+    "emailStatus": {
+      "type": "enumeration",
+      "enum": ["pending", "sent", "failed"],
+      "default": "pending"
+    }
+  }
+}

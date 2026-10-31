@@ -3,12 +3,14 @@
 import Typography from '@mui/material/Typography';
 import type { BlocksStatement } from '@/types/cms';
 import { ThemeSection } from '@/components/layout/ThemeSection';
+import { CtaButtonGroup } from '@/components/ui/CtaButtonGroup';
 
 type Props = {
   block: BlocksStatement;
+  locale: string;
 };
 
-export function StatementBlock({ block }: Props) {
+export function StatementBlock({ block, locale }: Props) {
   return (
     <ThemeSection
       narrow
@@ -45,6 +47,11 @@ export function StatementBlock({ block }: Props) {
           {block.body}
         </Typography>
       ) : null}
+      <CtaButtonGroup
+        buttons={block.buttons}
+        locale={locale}
+        sx={{ mt: { xs: 3.5, md: 4.5 }, alignSelf: 'stretch' }}
+      />
     </ThemeSection>
   );
 }

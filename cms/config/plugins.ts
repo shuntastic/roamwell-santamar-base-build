@@ -39,6 +39,33 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
       },
     },
   },
+  // Form notifications. Set SMTP_HOST to relay through a real mail server; without it,
+  // sendmail delivers directly to recipients' MX hosts and is often filtered as spam.
+  email: {
+    config: env('SMTP_HOST')
+      ? {
+          provider: 'nodemailer',
+          providerOptions: {
+            host: env('SMTP_HOST'),
+            port: env.int('SMTP_PORT', 587),
+            secure: env.bool('SMTP_SECURE', false),
+            auth: env('SMTP_USERNAME')
+              ? { user: env('SMTP_USERNAME'), pass: env('SMTP_PASSWORD') }
+              : undefined,
+          },
+          settings: {
+            defaultFrom: env('EMAIL_FROM', 'no-reply@santamar.example'),
+            defaultReplyTo: env('EMAIL_FROM', 'no-reply@santamar.example'),
+          },
+        }
+      : {
+          provider: 'sendmail',
+          settings: {
+            defaultFrom: env('EMAIL_FROM', 'no-reply@santamar.example'),
+            defaultReplyTo: env('EMAIL_FROM', 'no-reply@santamar.example'),
+          },
+        },
+  },
 });
 
 export default config;

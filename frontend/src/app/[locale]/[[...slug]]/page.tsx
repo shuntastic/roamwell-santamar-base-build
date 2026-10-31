@@ -61,7 +61,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     : getFallbackPage(path, locale);
 
   return {
-    title: page?.seo?.metaTitle || page?.title || 'Santamar',
+    title: page?.seo?.metaTitle || page?.title,
     description: page?.seo?.metaDescription || undefined,
   };
 }

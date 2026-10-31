@@ -54,6 +54,16 @@ const visuallyHidden = {
 
 const COLUMN_GAP_PX = 12;
 
+const TITLE_OVERLAY_CLASS = 'MediaGrid-titleOverlay';
+const TITLE_ENTER = '200ms cubic-bezier(0.2, 0, 0, 1)';
+const TITLE_EXIT = '140ms cubic-bezier(0.4, 0, 1, 1)';
+
+const titleRevealed = {
+  opacity: 1,
+  transform: 'none',
+  transition: `opacity ${TITLE_ENTER}, transform ${TITLE_ENTER}`,
+};
+
 function asArray<T>(value: T[] | T | null | undefined): T[] {
   if (!value) return [];
   return Array.isArray(value) ? value : [value];
@@ -597,6 +607,19 @@ export function MediaGridBlock({ block }: Props) {
                   '& img, & video': { transition: 'transform 500ms ease' },
                   '&:hover img, &:hover video': { transform: 'scale(1.035)' },
                 },
+                [`& .${TITLE_OVERLAY_CLASS}`]: {
+                  opacity: 0,
+                  transform: 'translateY(0.5rem)',
+                  transition: `opacity ${TITLE_EXIT}, transform ${TITLE_EXIT}`,
+                },
+                [`&:focus-visible .${TITLE_OVERLAY_CLASS}`]: titleRevealed,
+                // Touch browsers keep :hover after a tap, so only real pointers reveal on hover.
+                '@media (hover: hover) and (pointer: fine)': {
+                  [`&:hover .${TITLE_OVERLAY_CLASS}`]: titleRevealed,
+                },
+                '@media (prefers-reduced-motion: reduce)': {
+                  [`& .${TITLE_OVERLAY_CLASS}`]: { transform: 'none' },
+                },
               }}
             >
               <Box
@@ -663,14 +686,16 @@ export function MediaGridBlock({ block }: Props) {
                 ) : null}
                 {titleOverlay && showTitles && item.title ? (
                   <Box
-                  sx={{
-                    position: 'absolute',
-                    zIndex: 1,
-                    left: 0,
-                    bottom: 0,
-                    bgcolor: titleOverlay.background,
-                    width: "100%",
-                  }}
+                    className={TITLE_OVERLAY_CLASS}
+                    sx={{
+                      position: 'absolute',
+                      zIndex: 1,
+                      left: 0,
+                      bottom: 0,
+                      bgcolor: titleOverlay.background,
+                      width: '100%',
+                      pointerEvents: 'none',
+                    }}
                   >
                     <Typography
                       component="span"

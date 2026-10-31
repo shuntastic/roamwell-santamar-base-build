@@ -7,16 +7,22 @@ type Props = {
   children: React.ReactNode;
   /** Use a narrower reading column (styled copy). */
   narrow?: boolean;
+  /** Overrides both `narrow` and the theme's `contentMaxWidth`. */
+  maxWidth?: ContainerProps['maxWidth'];
   sx?: ContainerProps['sx'];
   disableGutters?: boolean;
 };
 
 /** Section shell that follows the active theme's layout tokens. */
-export function ThemeSection({ children, narrow = false, sx, disableGutters }: Props) {
+export function ThemeSection({
+  children,
+  narrow = false,
+  maxWidth: maxWidthOverride,
+  sx,
+  disableGutters,
+}: Props) {
   const theme = useTheme();
-  const maxWidth = narrow
-    ? 'md'
-    : theme.layout.contentMaxWidth;
+  const maxWidth = maxWidthOverride ?? (narrow ? 'md' : theme.layout.contentMaxWidth);
 
   return (
     <Container

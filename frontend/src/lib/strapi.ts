@@ -34,8 +34,12 @@ const PAGE_POPULATE: Record<string, unknown> = {
       'blocks.hero': {
         populate: ['backgroundMedia', 'cta'],
       },
-      'blocks.rich-text': true,
-      'blocks.statement': true,
+      'blocks.rich-text': {
+        populate: ['buttons'],
+      },
+      'blocks.statement': {
+        populate: ['buttons'],
+      },
       'blocks.image-text': {
         populate: ['images'],
       },
@@ -85,6 +89,10 @@ const PAGE_POPULATE: Record<string, unknown> = {
       'blocks.booking-search': true,
       'blocks.contact-form': {
         populate: ['image'],
+      },
+      'blocks.production-inquiry-form': true,
+      'blocks.cta-buttons': {
+        populate: ['buttons'],
       },
       'blocks.modal-button': true,
       'blocks.video-embed': {

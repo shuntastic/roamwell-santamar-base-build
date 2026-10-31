@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_shared_email_recipients",
+  "info": {
+    "displayName": "Email Recipient",
+    "description": "An email address that receives form submissions",
+    "icon": "envelop"
+  },
+  "options": {},
+  "attributes": {
+    "email": {
+      "type": "email",
+      "required": true
+    }
+  }
+}

@@ -69,6 +69,8 @@
         "blocks.booking-calendar",
         "blocks.booking-search",
         "blocks.contact-form",
+        "blocks.production-inquiry-form",
+        "blocks.cta-buttons",
         "blocks.modal-button",
         "blocks.video-embed"
       ]

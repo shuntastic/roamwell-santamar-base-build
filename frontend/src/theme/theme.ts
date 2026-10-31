@@ -260,6 +260,23 @@ const blackboxBody = {
   fontStyle: 'normal',
 } as const;
 
+const { breakpoints } = createTheme();
+
+const blackboxH2 = {
+  ...blackboxHeading,
+  [breakpoints.down('sm')]: {
+    fontSize: '2.5rem',
+  },
+} as const;
+
+const blackboxH4 = {
+  ...blackboxHeading,
+  fontSize: '2.25rem',
+  [breakpoints.down('sm')]: {
+    fontSize: '1.75rem',
+  },
+} as const;
+
 /** Black Box — Widescreen titles, Mokoko body, stone type on a cool gray field. */
 const blackbox = buildTheme({
   id: 'blackbox',
@@ -312,9 +329,9 @@ const blackbox = buildTheme({
     fontWeightRegular: 400,
     fontWeightMedium: 400,
     h1: blackboxHeading,
-    h2: blackboxHeading,
+    h2: blackboxH2,
     h3: blackboxHeading,
-    h4: blackboxHeading,
+    h4: blackboxH4,
     h5: blackboxHeading,
     h6: blackboxHeading,
     subtitle1: blackboxBody,

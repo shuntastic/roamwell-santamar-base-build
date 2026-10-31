@@ -640,6 +640,8 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
         'blocks.booking-calendar',
         'blocks.booking-search',
         'blocks.contact-form',
+        'blocks.production-inquiry-form',
+        'blocks.cta-buttons',
         'blocks.modal-button',
         'blocks.video-embed',
       ]
@@ -674,6 +676,103 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiProductionInquiryProductionInquiry
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'production_inquiries';
+  info: {
+    description: 'Submissions from the Production Inquiry Form block';
+    displayName: 'Production Inquiry';
+    pluralName: 'production-inquiries';
+    singularName: 'production-inquiry';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    company: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    crewSize: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 1;
+        },
+        number
+      >;
+    details: Schema.Attribute.Text &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 5000;
+      }>;
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
+    emailStatus: Schema.Attribute.Enumeration<['pending', 'sent', 'failed']> &
+      Schema.Attribute.DefaultTo<'pending'>;
+    format: Schema.Attribute.Enumeration<['still', 'motion', 'both']>;
+    hoursNeeded: Schema.Attribute.Decimal &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::production-inquiry.production-inquiry'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 120;
+      }>;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    prepStrikeDateEnd: Schema.Attribute.Date;
+    prepStrikeDateStart: Schema.Attribute.Date;
+    productionType: Schema.Attribute.Enumeration<
+      [
+        'commercial',
+        'editorial',
+        'film_tv',
+        'corporate',
+        'music_video',
+        'other',
+      ]
+    > &
+      Schema.Attribute.Required;
+    productionTypeOther: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 80;
+      }>;
+    projectBrand: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 160;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    recipients: Schema.Attribute.Text;
+    shootDateEnd: Schema.Attribute.Date;
+    shootDateStart: Schema.Attribute.Date & Schema.Attribute.Required;
+    sourceUrl: Schema.Attribute.String;
+    submittedLocale: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    vehicleCount: Schema.Attribute.Integer &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      >;
   };
 }
 
@@ -1328,6 +1427,7 @@ declare module '@strapi/strapi' {
       'api::media-category.media-category': ApiMediaCategoryMediaCategory;
       'api::navigation.navigation': ApiNavigationNavigation;
       'api::page.page': ApiPagePage;
+      'api::production-inquiry.production-inquiry': ApiProductionInquiryProductionInquiry;
       'api::site.site': ApiSiteSite;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

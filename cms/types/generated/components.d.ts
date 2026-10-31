@@ -62,6 +62,26 @@ export interface BlocksContactForm extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksCtaButtons extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_cta_buttons';
+  info: {
+    description: 'A centered row of up to three call-to-action buttons';
+    displayName: 'CTA Buttons';
+    icon: 'cursor';
+  };
+  attributes: {
+    buttons: Schema.Attribute.Component<'shared.cta-button', true> &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 3;
+          min: 1;
+        },
+        number
+      >;
+  };
+}
+
 export interface BlocksFeatureGrid extends Struct.ComponentSchema {
   collectionName: 'components_blocks_feature_grids';
   info: {
@@ -240,15 +260,51 @@ export interface BlocksModalButton extends Struct.ComponentSchema {
   };
 }
 
+export interface BlocksProductionInquiryForm extends Struct.ComponentSchema {
+  collectionName: 'components_blocks_production_inquiry_forms';
+  info: {
+    description: 'Location / production booking inquiry form. Submissions are emailed to the recipients below and saved under Production Inquiries.';
+    displayName: 'Production Inquiry Form';
+    icon: 'file';
+  };
+  attributes: {
+    intro: Schema.Attribute.Text &
+      Schema.Attribute.DefaultTo<'Have a project in mind? Send us a few production details and we\u2019ll get back to you with availability and a quote. Rates are based on production type, crew size, hours, usage, and location requirements.\n\nScouting visits are available by appointment.'>;
+    recipients: Schema.Attribute.Component<'shared.email-recipient', true> &
+      Schema.Attribute.Required &
+      Schema.Attribute.Private &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 10;
+          min: 1;
+        },
+        number
+      >;
+    submitLabel: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Check Availability'>;
+    successMessage: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Thank you. Our production team will be in touch shortly.'>;
+    title: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'Check Availability'>;
+  };
+}
+
 export interface BlocksRichText extends Struct.ComponentSchema {
   collectionName: 'components_blocks_rich_texts';
   info: {
-    description: 'Styled copy block for long-form content';
+    description: 'Styled copy block for long-form content, with up to three optional buttons';
     displayName: 'Rich Text';
     icon: 'write';
   };
   attributes: {
     body: Schema.Attribute.Blocks & Schema.Attribute.Required;
+    buttons: Schema.Attribute.Component<'shared.cta-button', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 3;
+        },
+        number
+      >;
     title: Schema.Attribute.String;
   };
 }
@@ -256,12 +312,19 @@ export interface BlocksRichText extends Struct.ComponentSchema {
 export interface BlocksStatement extends Struct.ComponentSchema {
   collectionName: 'components_blocks_statements';
   info: {
-    description: 'Centered statement text used as a section divider';
+    description: 'Centered statement text used as a section divider, with up to three optional buttons';
     displayName: 'Statement';
     icon: 'quote';
   };
   attributes: {
     body: Schema.Attribute.Text;
+    buttons: Schema.Attribute.Component<'shared.cta-button', true> &
+      Schema.Attribute.SetMinMax<
+        {
+          max: 3;
+        },
+        number
+      >;
     title: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
@@ -317,6 +380,44 @@ export interface MediaSlideshow extends Struct.ComponentSchema {
     slides: Schema.Attribute.Component<'media.slide', true> &
       Schema.Attribute.Required;
     title: Schema.Attribute.String;
+  };
+}
+
+export interface SharedCtaButton extends Struct.ComponentSchema {
+  collectionName: 'components_shared_cta_buttons';
+  info: {
+    description: 'A single call-to-action button: label, destination, tab behavior, size, and style';
+    displayName: 'CTA Button';
+    icon: 'cursor';
+  };
+  attributes: {
+    label: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 40;
+      }>;
+    openInNewTab: Schema.Attribute.Boolean &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<false>;
+    size: Schema.Attribute.Enumeration<['small', 'medium', 'large']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'medium'>;
+    style: Schema.Attribute.Enumeration<['primary', 'secondary', 'text']> &
+      Schema.Attribute.Required &
+      Schema.Attribute.DefaultTo<'primary'>;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
+export interface SharedEmailRecipient extends Struct.ComponentSchema {
+  collectionName: 'components_shared_email_recipients';
+  info: {
+    description: 'An email address that receives form submissions';
+    displayName: 'Email Recipient';
+    icon: 'envelop';
+  };
+  attributes: {
+    email: Schema.Attribute.Email & Schema.Attribute.Required;
   };
 }
 
@@ -381,6 +482,7 @@ declare module '@strapi/strapi' {
       'blocks.booking-cta': BlocksBookingCta;
       'blocks.booking-search': BlocksBookingSearch;
       'blocks.contact-form': BlocksContactForm;
+      'blocks.cta-buttons': BlocksCtaButtons;
       'blocks.feature-grid': BlocksFeatureGrid;
       'blocks.feature-item': BlocksFeatureItem;
       'blocks.hero': BlocksHero;
@@ -391,11 +493,14 @@ declare module '@strapi/strapi' {
       'blocks.media-grid-category': BlocksMediaGridCategory;
       'blocks.media-grid-item': BlocksMediaGridItem;
       'blocks.modal-button': BlocksModalButton;
+      'blocks.production-inquiry-form': BlocksProductionInquiryForm;
       'blocks.rich-text': BlocksRichText;
       'blocks.statement': BlocksStatement;
       'blocks.video-embed': BlocksVideoEmbed;
       'media.slide': MediaSlide;
       'media.slideshow': MediaSlideshow;
+      'shared.cta-button': SharedCtaButton;
+      'shared.email-recipient': SharedEmailRecipient;
       'shared.link': SharedLink;
       'shared.nav-item': SharedNavItem;
       'shared.seo': SharedSeo;

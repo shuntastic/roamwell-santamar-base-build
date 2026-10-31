@@ -26,8 +26,8 @@ Each page supports:
 ### Available Dynamic Zone components
 
 - `blocks.hero`
-- `blocks.rich-text`
-- `blocks.statement`
+- `blocks.rich-text` (optional 0–3 CTA buttons below the copy)
+- `blocks.statement` (optional 0–3 CTA buttons below the copy)
 - `blocks.image-text`
 - `blocks.feature-grid`
 - `blocks.media-gallery`
@@ -37,6 +37,8 @@ Each page supports:
 - `blocks.booking-calendar` (paste Hostaway calendar embed)
 - `blocks.booking-search` (paste Hostaway search bar embed)
 - `blocks.contact-form`
+- `blocks.production-inquiry-form` (emails each submission to the block's recipients and saves it under **Production Inquiries**; configure `EMAIL_FROM` / `SMTP_*` in `cms/.env`)
+- `blocks.cta-buttons` (centered row of 1–3 buttons: label, URL, new tab, size, style — the same `shared.cta-button` component used by Statement and Rich Text)
 - `blocks.modal-button`
 - `blocks.video-embed`
 
